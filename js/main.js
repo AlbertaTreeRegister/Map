@@ -61,6 +61,7 @@ const airTablePersonalAccessToken = 'patS6srnbXVthid6g.8b1b2fe74ad1685642ceadbb9
 let markers = [];
 let offset = '';
 let allRecords = [];
+let nominating = false;
 
 async function fetchAllRecords() {
   const headers = {
@@ -116,141 +117,150 @@ async function fetchAllRecords() {
   map.addLayer(markerLayer);
 
   map.on('click', function(event) {
-    let feature = map.forEachFeatureAtPixel(event.pixel, function(feature) {
-      return feature;
-    });
-    if (feature) {
-      //var properties = feature.getProperties();
-      let html = '';
-      //for (var key in properties) {
-        //if (typeof properties[key] === 'string' && properties.hasOwnProperty(key)) {
-          //html += '<p><strong>' + key + ':</strong> ' + properties[key] + '</p>';
-        //}
-      //}
+    if(nominating) {
+      const coordinate = event.coordinate;
+      const latitude = ol.proj.toLonLat(coordinate)[1];
+      const longitude = ol.proj.toLonLat(coordinate)[0];
+      debugger;
 
-      let geometry = feature.getGeometry();
-      let treeCoordinates = geometry.getCoordinates();
-      let name = feature.get('Tree Name');
-      html += '<p class="treeName"><strong>' + name + '</strong></p>';
-      let description = feature.get('Description');
-      if (description) {
-        html += '<p>' + description + '</p>';
-      }
-
-      let address = feature.get('Address');
-      if(address){
-        html += '<p><strong>Location:' + '</strong> ' + address + '</p>';
-      }
-      let age = feature.get('Age');
-      if(age){
-        html += '<p><strong>Estimated Age:' + '</strong> ' + age + ' Years Old</p>';
-      }
-      let condition = feature.get('Condition');
-      if(condition){
-        html += '<p><strong>Condition:' + '</strong> ' + condition + '</p>';
-      }
-
-      const infoPanel = document.getElementById('infoPanel-content');
-      infoPanel.innerHTML = html;
-
-      let googleMapsButton = document.createElement('button');
-      googleMapsButton.style.border = "none";
-      googleMapsButton.style.background = "none";
-      googleMapsButton.title = "Open in Google Maps";
-      let googleMapsIcon = '<img id="googleMapsIcon" src="img/google-maps-old.svg" style="width: 48px; height: 48px">';
-      googleMapsButton.innerHTML = googleMapsIcon;
-      //googleMapsButton.appendChild(googleMapsIcon);
-      //googleMapsButton.innerHTML = 'Open in Google Maps';
-      googleMapsButton.addEventListener('click', function() {
-        let latitude = feature.get('Latitude'); // replace with the latitude of the location
-        let longitude = feature.get('Longitude'); // replace with the longitude of the location
-        let url = 'https://www.google.com/maps/search/?api=1&query=' + latitude + '%2C' + longitude;
-        window.open(url);
+      const airtableFormUrl = `https://airtable.com/shrT9KRuUUqyMQJ89?prefill_Latitude=${latitude}&prefill_Longitude=${longitude}`;
+      window.open(airtableFormUrl, '_blank');
+      disableNominating();
+    }
+    else {
+      let feature = map.forEachFeatureAtPixel(event.pixel, function (feature) {
+        return feature;
       });
+      if (feature) {
+        //var properties = feature.getProperties();
+        let html = '';
+        //for (var key in properties) {
+        //if (typeof properties[key] === 'string' && properties.hasOwnProperty(key)) {
+        //html += '<p><strong>' + key + ':</strong> ' + properties[key] + '</p>';
+        //}
+        //}
 
-      infoPanel.appendChild(googleMapsButton);
+        let geometry = feature.getGeometry();
+        let treeCoordinates = geometry.getCoordinates();
+        let name = feature.get('Tree Name');
+        html += '<p class="treeName"><strong>' + name + '</strong></p>';
+        let description = feature.get('Description');
+        if (description) {
+          html += '<p>' + description + '</p>';
+        }
 
-      //set up image carousel
+        let address = feature.get('Address');
+        if (address) {
+          html += '<p><strong>Location:' + '</strong> ' + address + '</p>';
+        }
+        let age = feature.get('Age');
+        if (age) {
+          html += '<p><strong>Estimated Age:' + '</strong> ' + age + ' Years Old</p>';
+        }
+        let condition = feature.get('Condition');
+        if (condition) {
+          html += '<p><strong>Condition:' + '</strong> ' + condition + '</p>';
+        }
 
-      // reset carousel
-      const carouselIndicators = document.querySelector(".carousel-indicators");
-      carouselIndicators.innerHTML = "";
-      const carouselInner = document.querySelector(".carousel-inner");
-      carouselInner.innerHTML = "";
+        const infoPanel = document.getElementById('infoPanel-content');
+        infoPanel.innerHTML = html;
 
-      let photos = feature.get('Photo');
-      if(photos) {
-        photos.forEach((image, index) => {
-          // create carousel indicator
-          const indicator = document.createElement("button");
-          indicator.setAttribute("data-bs-target", "treeCarousel");
-          indicator.setAttribute("data-bs-slide-to", index);
-          indicator.setAttribute("aria-label", 'Slide ' + (index + 1));
-          if (index === 0) indicator.classList.add("active");
-          carouselIndicators.appendChild(indicator);
-
-          // create carousel item
-          const item = document.createElement("div");
-          item.classList.add("carousel-item");
-          if (index === 0) item.classList.add("active");
-
-          // create image element
-          const img = document.createElement("img");
-          img.classList.add("d-block", "w-100");
-          img.src = image.url;
-
-          // add image to item and item to inner carousel
-          item.appendChild(img);
-          carouselInner.appendChild(item);
+        let googleMapsButton = document.createElement('button');
+        googleMapsButton.style.border = "none";
+        googleMapsButton.style.background = "none";
+        googleMapsButton.title = "Open in Google Maps";
+        let googleMapsIcon = '<img id="googleMapsIcon" src="img/google-maps-old.svg" style="width: 48px; height: 48px">';
+        googleMapsButton.innerHTML = googleMapsIcon;
+        //googleMapsButton.appendChild(googleMapsIcon);
+        //googleMapsButton.innerHTML = 'Open in Google Maps';
+        googleMapsButton.addEventListener('click', function () {
+          let latitude = feature.get('Latitude'); // replace with the latitude of the location
+          let longitude = feature.get('Longitude'); // replace with the longitude of the location
+          let url = 'https://www.google.com/maps/search/?api=1&query=' + latitude + '%2C' + longitude;
+          window.open(url);
         });
 
-        const carouselNextBtn = document.querySelector(".carousel-control-next");
-        const carouselPrevBtn = document.querySelector(".carousel-control-prev");
-        if(photos.length === 1)
-        {
-          carouselIndicators.style.display = "none";
-          carouselNextBtn.style.display = "none";
-          carouselPrevBtn.style.display = "none";
-        }
-        else
-        {
-          carouselIndicators.style.display = "";
-          carouselNextBtn.style.display = "";
-          carouselPrevBtn.style.display = "";
-        }
+        infoPanel.appendChild(googleMapsButton);
 
-        const carouselImages = document.querySelectorAll("#treeCarousel .carousel-item img");
+        //set up image carousel
 
-        if (document.fullscreenEnabled) {
-          carouselImages.forEach((image) => {
-            image.addEventListener('click', function() {
-              if (!document.fullscreenElement) {
-                image.requestFullscreen();
-                image.style.cursor = 'zoom-out';
-              } else {
-                document.exitFullscreen();
-                image.style.cursor = 'zoom-in';
-              }
-            });
+        // reset carousel
+        const carouselIndicators = document.querySelector(".carousel-indicators");
+        carouselIndicators.innerHTML = "";
+        const carouselInner = document.querySelector(".carousel-inner");
+        carouselInner.innerHTML = "";
 
-            document.addEventListener('fullscreenchange', function() {
-              if (document.fullscreenElement) {
-                image.style.width = '100%';
-                image.style.height = '100%';
-                image.style.position = 'fixed';
-                image.style.top = '0';
-                image.style.left = '0';
-                image.style.zIndex = '9999';
-              } else {
-                image.style.width = '';
-                image.style.height = '';
-                image.style.position = '';
-                image.style.top = '';
-                image.style.left = '';
-                image.style.zIndex = '';
-              }
-            });
+        let photos = feature.get('Photo');
+        if (photos) {
+          photos.forEach((image, index) => {
+            // create carousel indicator
+            const indicator = document.createElement("button");
+            indicator.setAttribute("data-bs-target", "treeCarousel");
+            indicator.setAttribute("data-bs-slide-to", index);
+            indicator.setAttribute("aria-label", 'Slide ' + (index + 1));
+            if (index === 0) indicator.classList.add("active");
+            carouselIndicators.appendChild(indicator);
+
+            // create carousel item
+            const item = document.createElement("div");
+            item.classList.add("carousel-item");
+            if (index === 0) item.classList.add("active");
+
+            // create image element
+            const img = document.createElement("img");
+            img.classList.add("d-block", "w-100");
+            img.src = image.url;
+
+            // add image to item and item to inner carousel
+            item.appendChild(img);
+            carouselInner.appendChild(item);
           });
+
+          const carouselNextBtn = document.querySelector(".carousel-control-next");
+          const carouselPrevBtn = document.querySelector(".carousel-control-prev");
+          if (photos.length === 1) {
+            carouselIndicators.style.display = "none";
+            carouselNextBtn.style.display = "none";
+            carouselPrevBtn.style.display = "none";
+          } else {
+            carouselIndicators.style.display = "";
+            carouselNextBtn.style.display = "";
+            carouselPrevBtn.style.display = "";
+          }
+
+          const carouselImages = document.querySelectorAll("#treeCarousel .carousel-item img");
+
+          if (document.fullscreenEnabled) {
+            carouselImages.forEach((image) => {
+              image.addEventListener('click', function () {
+                if (!document.fullscreenElement) {
+                  image.requestFullscreen();
+                  image.style.cursor = 'zoom-out';
+                } else {
+                  document.exitFullscreen();
+                  image.style.cursor = 'zoom-in';
+                }
+              });
+
+              document.addEventListener('fullscreenchange', function () {
+                if (document.fullscreenElement) {
+                  image.style.width = '100%';
+                  image.style.height = '100%';
+                  image.style.position = 'fixed';
+                  image.style.top = '0';
+                  image.style.left = '0';
+                  image.style.zIndex = '9999';
+                } else {
+                  image.style.width = '';
+                  image.style.height = '';
+                  image.style.position = '';
+                  image.style.top = '';
+                  image.style.left = '';
+                  image.style.zIndex = '';
+                }
+              });
+            });
+          }
         }
       }
     }
@@ -258,3 +268,24 @@ async function fetchAllRecords() {
 }
 
 fetchAllRecords();
+
+function activateNominating()
+{
+  if(nominating) {
+    disableNominating();
+  }
+  else {
+    nominating = true;
+    const mapElement = document.getElementById('map');
+    mapElement.style.cursor = 'crosshair';
+    document.getElementById('nominateBtn').textContent = 'Cancel Nominating';
+  }
+}
+
+function disableNominating()
+{
+  nominating = false;
+  const mapElement = document.getElementById('map');
+  mapElement.style.cursor = 'auto';
+  document.getElementById('nominateBtn').textContent = 'Nominate a Tree';
+}

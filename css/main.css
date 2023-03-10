@@ -358,3 +358,19 @@ textarea {
 #map .ol-zoom-out.ol-has-tooltip:focus [role=tooltip] {
   top: 232px;
 }
+
+#nominateBtn {
+  background-color: #80B248;
+  color: #fff;
+  border: none;
+  border-radius: 30px; /* Increased border radius */
+  font-size: 18px;
+  font-weight: 700;
+  padding: 9px 19px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+#nominateBtn:hover {
+  background-color: #65922F;
+}
