@@ -121,8 +121,6 @@ async function fetchAllRecords() {
       const coordinate = event.coordinate;
       const latitude = ol.proj.toLonLat(coordinate)[1];
       const longitude = ol.proj.toLonLat(coordinate)[0];
-      debugger;
-
       const airtableFormUrl = `https://airtable.com/shrT9KRuUUqyMQJ89?prefill_Latitude=${latitude}&prefill_Longitude=${longitude}`;
       window.open(airtableFormUrl, '_blank');
       disableNominating();
