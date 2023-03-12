@@ -1,3 +1,9 @@
+//setup loading screen
+document.addEventListener("DOMContentLoaded", function() {
+  // Show the loading screen
+  document.getElementById("loading-screen").style.display = "flex";
+});
+
 // Set up the map
 let map = new ol.Map({
   target: 'map',
@@ -57,7 +63,7 @@ const airtableUrl = `https://api.airtable.com/v0/${baseId}/${tableName}?view=${m
 const airTablePersonalAccessToken = 'patS6srnbXVthid6g.8b1b2fe74ad1685642ceadbb93e63b8223ee21d14a569f9debe2e948a563170a';
 let markers = [];
 let offset = '';
-let allRecords = [];
+let treeRecords = [];
 let nominating = false;
 let displayFields = [
   'Address',
@@ -69,7 +75,7 @@ let displayFields = [
   'DBH (m)'
 ];
 
-async function fetchAllRecords() {
+async function fetchTreeRecords() {
   const headers = {
     Authorization: `Bearer ${airTablePersonalAccessToken}`,
   };
@@ -77,7 +83,7 @@ async function fetchAllRecords() {
     headers
   });
   let data = await response.json();
-  allRecords = data.records;
+  treeRecords = data.records;
   offset = data.offset;
 
   while (offset) {
@@ -86,12 +92,16 @@ async function fetchAllRecords() {
       headers
     });
     let data = await response.json();
-    allRecords = [...allRecords, ...data.records];
+    treeRecords = [...treeRecords, ...data.records];
     offset = data.offset;
   }
 
+  addTreeMarkers();
+}
+
+function addTreeMarkers() {
   // Add markers to the map
-  allRecords.forEach(function(record) {
+  treeRecords.forEach(function(record) {
     let marker = new ol.Feature({
       geometry: new ol.geom.Point(
         ol.proj.fromLonLat([
@@ -121,9 +131,10 @@ async function fetchAllRecords() {
   });
 
   map.addLayer(markerLayer);
+  document.getElementById("loading-screen").style.display = "none";
 }
 
-fetchAllRecords();
+fetchTreeRecords();
 
 map.on('click', function(event) {
   if(nominating) {
@@ -189,7 +200,7 @@ map.on('click', function(event) {
         photos.forEach((image, index) => {
           // create carousel indicator
           const indicator = document.createElement("button");
-          indicator.setAttribute("data-bs-target", "treeCarousel");
+          indicator.setAttribute("data-bs-target", "#treeCarousel");
           indicator.setAttribute("data-bs-slide-to", index);
           indicator.setAttribute("aria-label", 'Slide ' + (index + 1));
           if (index === 0) indicator.classList.add("active");
@@ -227,6 +238,7 @@ map.on('click', function(event) {
 
         if (document.fullscreenEnabled) {
           carouselImages.forEach((image) => {
+            image.style.cursor = 'zoom-in';
             image.addEventListener('click', function () {
               if (!document.fullscreenElement) {
                 image.requestFullscreen();
@@ -256,6 +268,7 @@ map.on('click', function(event) {
             });
           });
         }
+        const carousel = new bootstrap.Carousel('#treeCarousel');
       }
     }
   }
