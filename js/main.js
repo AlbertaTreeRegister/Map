@@ -45,12 +45,14 @@ map.on('pointermove', function(evt) {
 let iconStyles = {
   'Individual Tree': new ol.style.Style({
     image: new ol.style.Icon({
-      src: 'img/tree.png'
+      src: 'img/tree.png',
+      anchor: [0.5, 1]
     })
   }),
   'Grove of Trees': new ol.style.Style({
     image: new ol.style.Icon({
-      src: 'img/forest.png'
+      src: 'img/forest.png',
+      anchor: [0.5, 1],
     })
   })
 };
