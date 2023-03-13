@@ -32,37 +32,41 @@
 <body>
   <!-- Add your site or application content here -->
   <div id="loading-screen"></div>
-  <div id="map"></div>
-  <div id="tooltip" style="display: none; z-index: 9999; background-color: #fff; padding: 10px; border: 1px solid #ccc; font-size:1em;"></div>
-  <div id="infoPanel">
-    <div id="infoPanel-header">
-      <img src="img/Alberta-Tree-Registry-PNG-long.png" style="margin: auto; max-height:75px; max-width: -webkit-fill-available;"/>
-      <button id="nominateBtn" onclick="activateNominating()">Nominate a Tree</button>
-    </div>
-    <div id="treeImages">
-      <div id="treeCarousel" class="carousel slide" data-bs-ride="false" data-bs-touch="true">
-        <!-- Indicators -->
-        <div class="carousel-indicators"></div>
 
-        <!-- Wrapper for slides -->
-        <div class="carousel-inner"></div>
+  <div id="map-container">
+    <div id="map"></div>
+    <div id="infoPanel">
+      <div id="infoPanel-header">
+        <img src="img/Alberta-Tree-Registry-PNG-long.png" style="margin: auto; max-height:75px; max-width: -webkit-fill-available;"/>
+        <button id="nominateBtn" onclick="activateNominating()">Nominate a Tree</button>
+      </div>
+      <div id="treeImages">
+        <div id="treeCarousel" class="carousel slide" data-bs-ride="false" data-bs-touch="true">
+          <!-- Indicators -->
+          <div class="carousel-indicators"></div>
 
-        <!-- Controls -->
-        <button class="carousel-control-prev" type="button" data-bs-target="#treeCarousel" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#treeCarousel" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-        </button>
+          <!-- Wrapper for slides -->
+          <div class="carousel-inner"></div>
+
+          <!-- Controls -->
+          <button class="carousel-control-prev" type="button" data-bs-target="#treeCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#treeCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      </div>
+      <div id="infoPanel-content">
+        <p class="treeName"><strong>Welcome to the Alberta Tree Register Map</strong></p>
+        <p>Click on a tree for more information or click on the nominate button and select a location on the map to add a tree to the register.</p>
       </div>
     </div>
-    <div id="infoPanel-content">
-      <p class="treeName"><strong>Welcome to the Alberta Tree Register Map</strong></p>
-      <p>Click on a tree for more information or click on the nominate button and select a location on the map to add a tree to the register.</p>
-    </div>
   </div>
+  <div id="tooltip" style="display: none; z-index: 9999; background-color: #fff; padding: 10px; border: 1px solid #ccc; font-size:1em;"></div>
+
   <script src="js/vendor/modernizr-3.11.2.min.js"></script>
   <script src="js/plugins.js"></script>
   <script src="js/main.js"></script>
