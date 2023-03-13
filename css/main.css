@@ -299,7 +299,7 @@ textarea {
   top: 0;
   left: 0;
   width: 50%;
-  max-width: 390px;
+  max-width: 500px;
   height: 100%;
   background-color: #fff;
   border-radius: 5px;
@@ -309,6 +309,7 @@ textarea {
 
 #infoPanel-header {
   display: flex;
+  background-color: white;
   z-index: 9990;
   justify-content: center;
   align-items: center;
@@ -362,15 +363,18 @@ textarea {
 
 /* Styles for mobile devices */
 @media (max-width: 767px) {
-
+  body {
+    overflow-x: hidden;
+  }
 
   #map {
     position: absolute;
-    bottom: 35%;
+    bottom: 20%;
   }
   #infoPanel {
     position: absolute;
-    top: 65%;
+    max-width: 766px;
+    top: 80%;
     bottom: 0;
     left: 0;
     right: 0;
