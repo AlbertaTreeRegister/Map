@@ -390,6 +390,11 @@ body {
     display: block;
     height: auto;
     width: 100vw;
+    overflow-y: visible;
+  }
+
+  #infoPanel-content {
+    overflow-y: auto;
   }
 }
 
