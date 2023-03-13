@@ -305,6 +305,7 @@ textarea {
   border-radius: 5px;
   padding: 0;
   font-size: 1em;
+  overflow-y: auto;
 }
 
 #infoPanel-header {
@@ -319,7 +320,6 @@ textarea {
 #infoPanel-content {
   flex: 1;
   padding: 20px;
-  overflow-y: auto;
 }
 
 .treeName {
@@ -330,22 +330,6 @@ textarea {
 .ol-zoom {
   right: 8px;
   left:auto;
-}
-
-#nominateBtn {
-  background-color: #80B248;
-  color: #fff;
-  border: none;
-  border-radius: 30px; /* Increased border radius */
-  font-size: 18px;
-  font-weight: 700;
-  padding: 9px 19px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-
-#nominateBtn:hover {
-  background-color: #65922F;
 }
 
 #loading-screen {
@@ -396,4 +380,8 @@ textarea {
     height: auto;
     width: 100vw;
   }
+}
+
+.dropdown-item {
+  cursor: pointer;
 }

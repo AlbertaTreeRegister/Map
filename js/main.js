@@ -290,7 +290,7 @@ map.on('click', function(event) {
         // On mobile devices
         const myDiv = document.getElementById('infoPanel');
         const rect = myDiv.getBoundingClientRect();
-        const offset = window.scrollY;
+        const offset = window.pageYOffset;
         const top = rect.top + offset;
 
         window.scrollTo({
@@ -311,7 +311,7 @@ function activateNominating()
     nominating = true;
     const mapElement = document.getElementById('map');
     mapElement.style.cursor = 'crosshair';
-    //document.getElementById('nominateBtn').textContent = 'Cancel Nominating';
+    document.getElementById('nominateBtn').textContent = 'Cancel Nominating';
   }
 }
 
@@ -320,15 +320,8 @@ function disableNominating()
   nominating = false;
   const mapElement = document.getElementById('map');
   mapElement.style.cursor = 'auto';
-  //document.getElementById('nominateBtn').textContent = 'Nominate a Tree';
+  document.getElementById('nominateBtn').textContent = 'Nominate a Tree';
 }
-
-const mapElement = document.getElementById('optionsBtn');
-
-function options(){
-
-}
-
 const carouselNextBtn = document.querySelector(".carousel-control-next");
 const carouselPrevBtn = document.querySelector(".carousel-control-prev");
 carouselNextBtn.style.display = "none";
