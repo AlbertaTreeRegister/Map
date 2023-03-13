@@ -135,8 +135,19 @@ function addTreeMarkers() {
   const container = document.getElementById('map');
   const containerSize = [container.clientWidth, container.clientHeight];
 
-// Set the size of the map canvas to match the size of the container element
+  // Set the size of the map canvas to match the size of the container element
   map.setSize(containerSize);
+  // disable pinchzoom if window is zoomed
+  if ('ontouchstart' in window && window.visualViewport) {
+    window.visualViewport.addEventListener('resize', function () {
+      const mapSize = map.getSize();
+      pinchZoom.setActive(
+        mapSize[0] * mapSize[1] <
+        (window.visualViewport.width * window.visualViewport.height) / 2
+      );
+      dragPan.setActive(pinchZoom.getActive());
+    });
+  }
 }
 
 function setupMapFunctions() {
