@@ -14,8 +14,6 @@ const destProj = 'EPSG:3857'; // The destination projection of the extent
 // Transform the extent to EPSG:3857
 const transformedExtent = ol.proj.transformExtent(albertaExtent, sourceProj, destProj);
 
-
-
 let iconStyles = {
   'Individual Tree': new ol.style.Style({
     image: new ol.style.Icon({
@@ -117,12 +115,9 @@ function addTreeMarkers() {
     layers: [tileLayer, markerLayer],
     view: new ol.View({
       center: ol.proj.fromLonLat([-114.337082, 54.678073]),
-      zoom: 6 // Set an appropriate zoom level for your data
-    }),
-    interactions: ol.interaction.defaults({
-      // Disable rotating
-      rotate: false,
-      pinchRotate: false
+      zoom: 6, // Set an appropriate zoom level for your data
+      constrainResolution: true,
+      enableRotation: false
     })
   });
 

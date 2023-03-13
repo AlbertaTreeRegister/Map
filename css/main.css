@@ -271,15 +271,35 @@ textarea {
  }
 
 #infoPanel {
-
-
-  top: 80%;
   bottom: 0;
   left: 0;
   right: 25%;
-  display: block;
-  height: auto;
-  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  width: 25%;
+  height: 100vh;
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 0;
+  font-size: 1em;
+  overflow-y: auto;
+}
+
+#infoPanel-header {
+  margin-left: initial;
+  background-color: white;
+  z-index: 9990;
+  justify-content: center;
+  align-items: center;
+  position: sticky;
+  top: 0;
+}
+
+#infoPanel-content {
+  flex: 1;
+  padding: 20px;
 }
 
 .ol-popup-content {
@@ -304,34 +324,6 @@ textarea {
   background-color: rgba(255, 255, 255, 0.8);
   z-index: 1000;
   margin: 20px;
-}
-
-#infoPanel {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 25%;
-  height: 100%;
-  background-color: #fff;
-  border-radius: 5px;
-  padding: 0;
-  font-size: 1em;
-}
-
-#infoPanel-header {
-  margin-left: initial;
-  background-color: white;
-  z-index: 9990;
-  justify-content: center;
-  align-items: center;
-  position: sticky;
-  top: 0;
-}
-
-#infoPanel-content {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
 }
 
 .treeName {
@@ -372,10 +364,15 @@ textarea {
   to {transform: rotate(360deg);}
 }
 
+body {
+  overflow: hidden;
+}
+
 /* Styles for mobile devices */
 @media (max-width: 767px) {
   body {
     overflow-x: hidden;
+    overflow-y: auto;
   }
 
   #map {
@@ -400,6 +397,4 @@ textarea {
   cursor: pointer;
 }
 
-body {
-  overflow-x: hidden;
-}
+
