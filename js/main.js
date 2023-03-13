@@ -114,11 +114,24 @@ function addTreeMarkers() {
     target: 'map',
     layers: [tileLayer, markerLayer],
     view: new ol.View({
-      center: ol.proj.fromLonLat([-114.337082, 54.678073]),
+      //center: ol.proj.fromLonLat([-114.337082, 54.678073]),
       zoom: 6, // Set an appropriate zoom level for your data
       enableRotation: false
     })
   });
+
+  if(!mobile) {
+    map.getView().fit([-14590808.089638153,
+      6089851.591243762,
+      -9581431.003940841,
+      8560296.345420659]);
+  }
+  else {
+    map.getView().fit([-13659617.090903055,
+      5914897.661690963,
+      -11869779.913198512,
+      9788288.887287462]);
+  }
 
   setupMapFunctions();
 
@@ -131,17 +144,6 @@ function addTreeMarkers() {
 
   // Set the size of the map canvas to match the size of the container element
   map.setSize(containerSize);
-  // disable pinchzoom if window is zoomed
-  if ('ontouchstart' in window && window.visualViewport) {
-    window.visualViewport.addEventListener('resize', function () {
-      const mapSize = map.getSize();
-      pinchZoom.setActive(
-        mapSize[0] * mapSize[1] <
-        (window.visualViewport.width * window.visualViewport.height) / 2
-      );
-      dragPan.setActive(pinchZoom.getActive());
-    });
-  }
 }
 
 function setupMapFunctions() {
