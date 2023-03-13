@@ -329,4 +329,8 @@ function options(){
 
 }
 
+const carouselNextBtn = document.querySelector(".carousel-control-next");
+const carouselPrevBtn = document.querySelector(".carousel-control-prev");
+carouselNextBtn.style.display = "none";
+carouselPrevBtn.style.display = "none";
 

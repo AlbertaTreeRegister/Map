@@ -309,6 +309,7 @@ textarea {
 
 #infoPanel-header {
   display: flex;
+  z-index: 9999;
   justify-content: center;
   align-items: center;
   position: sticky;
