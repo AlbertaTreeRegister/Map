@@ -299,7 +299,7 @@ textarea {
   top: 0;
   left: 0;
   width: 50%;
-  max-width: 500px;
+  max-width: 390px;
   height: 100%;
   background-color: #fff;
   border-radius: 5px;
@@ -362,9 +362,7 @@ textarea {
 
 /* Styles for mobile devices */
 @media (max-width: 767px) {
-  body {
-    overflow-x: hidden;
-  }
+
 
   #map {
     position: absolute;
@@ -384,4 +382,9 @@ textarea {
 
 .dropdown-item {
   cursor: pointer;
+}
+
+body {
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
