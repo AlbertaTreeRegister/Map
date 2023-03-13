@@ -309,6 +309,7 @@ textarea {
 
 #infoPanel-header {
   display: flex;
+  max-width: fit-content;
   background-color: white;
   z-index: 9990;
   justify-content: center;
