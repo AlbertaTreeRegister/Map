@@ -252,6 +252,7 @@ map.on('click', function(event) {
         if (document.fullscreenEnabled) {
           carouselImages.forEach((image) => {
             image.style.cursor = 'zoom-in';
+            image.style.maxHeight = '600px';
             image.addEventListener('click', function () {
               if (!document.fullscreenElement) {
                 image.requestFullscreen();
