@@ -366,11 +366,11 @@ textarea {
 
   #map {
     position: absolute;
-    bottom: 30%;
+    bottom: 35%;
   }
   #infoPanel {
     position: absolute;
-    top: 70%;
+    top: 65%;
     bottom: 0;
     left: 0;
     right: 0;
