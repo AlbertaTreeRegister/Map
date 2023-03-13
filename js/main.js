@@ -204,8 +204,12 @@ map.on('click', function(event) {
       const carouselInner = document.querySelector(".carousel-inner");
       carouselInner.innerHTML = "";
 
+      //const treeImagesContainer = document.getElementById('treeImages');
+
       let photos = feature.get('Photo');
       if (photos) {
+        //treeImagesContainer.style.display = "block";
+
         photos.forEach((image, index) => {
           // create carousel indicator
           const indicator = document.createElement("button");
@@ -279,6 +283,21 @@ map.on('click', function(event) {
         }
         const carousel = new bootstrap.Carousel('#treeCarousel');
       }
+      else {
+        //treeImagesContainer.style.display = "none";
+      }
+      if (window.matchMedia("(max-width: 767px)").matches) {
+        // On mobile devices
+        const myDiv = document.getElementById('infoPanel');
+        const rect = myDiv.getBoundingClientRect();
+        const offset = window.scrollY;
+        const top = rect.top + offset;
+
+        window.scrollTo({
+          top: top,
+          behavior: 'smooth'
+        });
+      }
     }
   }
 });
@@ -292,7 +311,7 @@ function activateNominating()
     nominating = true;
     const mapElement = document.getElementById('map');
     mapElement.style.cursor = 'crosshair';
-    document.getElementById('nominateBtn').textContent = 'Cancel Nominating';
+    //document.getElementById('nominateBtn').textContent = 'Cancel Nominating';
   }
 }
 
@@ -301,5 +320,13 @@ function disableNominating()
   nominating = false;
   const mapElement = document.getElementById('map');
   mapElement.style.cursor = 'auto';
-  document.getElementById('nominateBtn').textContent = 'Nominate a Tree';
+  //document.getElementById('nominateBtn').textContent = 'Nominate a Tree';
 }
+
+const mapElement = document.getElementById('optionsBtn');
+
+function options(){
+
+}
+
+

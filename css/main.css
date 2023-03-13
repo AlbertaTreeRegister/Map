@@ -377,6 +377,10 @@ textarea {
 
 /* Styles for mobile devices */
 @media (max-width: 767px) {
+  body {
+    overflow-x: hidden;
+  }
+
   #map {
     position: absolute;
     bottom: 30%;

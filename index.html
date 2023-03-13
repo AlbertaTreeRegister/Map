@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <title>Alberta Tree Register Map</title>
   <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" maximum-scale=1.0, user-scalable=no">
 
   <meta property="og:title" content="">
   <meta property="og:type" content="">
@@ -37,8 +37,17 @@
     <div id="map"></div>
     <div id="infoPanel">
       <div id="infoPanel-header">
-        <img src="img/Alberta-Tree-Registry-PNG-long.png" style="margin: auto; max-height:75px; max-width: -webkit-fill-available;"/>
-        <button id="nominateBtn" onclick="activateNominating()">Nominate a Tree</button>
+        <img src="img/Alberta-Tree-Registry-PNG-long.png" style="margin: auto; max-height:70px; max-width: -webkit-fill-available;"/>
+        <div class="btn-group">
+          <button id="optionsBtn" class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Options
+          </button>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" onclick="activateNominating()">Nominate a Tree</a></li>
+            <li><a class="dropdown-item" onclick="disableNominating()">Disable Nominating</a></li>
+          </ul>
+        </div>
+        <!-- <button id="nominateBtn" onclick="activateNominating()">Nominate a Tree</button> -->
       </div>
       <div id="treeImages">
         <div id="treeCarousel" class="carousel slide" data-bs-ride="false" data-bs-touch="true">
