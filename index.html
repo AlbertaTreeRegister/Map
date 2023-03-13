@@ -36,16 +36,18 @@
   <div id="map-container">
     <div id="map"></div>
     <div id="infoPanel">
-      <div id="infoPanel-header">
-        <img src="img/Alberta-Tree-Registry-PNG-long.png" style="margin: auto; max-height:70px; max-width: -webkit-fill-available;"/>
-        <div class="btn-group">
+      <div id="infoPanel-header" class="row mb-3 text-center">
+        <div class="col-8">
+          <img src="img/Alberta-Tree-Registry-PNG-long.png" style="margin: auto; max-height:70px; max-width: -webkit-fill-available;" />
+        </div>
+        <div class="btn-group col-4">
           <button id="optionsBtn" class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             Options
           </button>
           <ul class="dropdown-menu dropdown-menu-dark">
             <li><a id="nominateBtn" class="dropdown-item" onclick="activateNominating()">Nominate a Tree</a></li>
-            <li><a class="dropdown-item" onclick="">Leaderboard</a></li>
-            <li><a class="dropdown-item" onclick="">Credits</a></li>
+            <li><a class="dropdown-item disabled" onclick="">Leaderboard</a></li>
+            <li><a class="dropdown-item disabled" onclick="">Credits</a></li>
           </ul>
         </div>
         <!-- <button id="nominateBtn" onclick="activateNominating()">Nominate a Tree</button> -->
