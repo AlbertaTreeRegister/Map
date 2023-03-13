@@ -116,7 +116,6 @@ function addTreeMarkers() {
     view: new ol.View({
       center: ol.proj.fromLonLat([-114.337082, 54.678073]),
       zoom: 6, // Set an appropriate zoom level for your data
-      constrainResolution: true,
       enableRotation: false
     })
   });
