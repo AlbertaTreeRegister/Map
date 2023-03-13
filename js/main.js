@@ -20,7 +20,8 @@ let map = new ol.Map({
   }),
   interactions: ol.interaction.defaults({
     // Disable rotating
-    rotate: false
+    rotate: false,
+    pinchRotate: false
   })
 });
 
