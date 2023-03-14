@@ -1,42 +1,6 @@
 const mobile = window.matchMedia("(max-width: 767px)").matches;
 let map = '';
-
-//setup loading screen
-document.addEventListener("DOMContentLoaded", function() {
-  // Show the loading screen
-  document.getElementById("loading-screen").style.display = "flex";
-});
-
-// Define the extent of the map to cover Alberta
-const albertaExtent = [-121.54, 48.99, -110.00, 60.00];
-const sourceProj = 'EPSG:4326'; // The source projection of the extent
-const destProj = 'EPSG:3857'; // The destination projection of the extent
-// Transform the extent to EPSG:3857
-const transformedExtent = ol.proj.transformExtent(albertaExtent, sourceProj, destProj);
-
-let iconStyles = {
-  'Individual Tree': new ol.style.Style({
-    image: new ol.style.Icon({
-      src: 'img/tree.png',
-      anchor: [0.5, 1]
-    })
-  }),
-  'Grove of Trees': new ol.style.Style({
-    image: new ol.style.Icon({
-      src: 'img/forest.png',
-      anchor: [0.5, 1],
-    })
-  })
-};
-
-// Fetch data from Airtable
-const baseId = 'appQryFCb5Fi3nZ4c';
-const tableName = 'tbljBWCUMUSwrF2co';
-const mapViewId = 'viw8Jbt3m4xWa1f1h';
-const airtableUrl = `https://api.airtable.com/v0/${baseId}/${tableName}?view=${mapViewId}`;
-const airTablePersonalAccessToken = 'patS6srnbXVthid6g.8b1b2fe74ad1685642ceadbb93e63b8223ee21d14a569f9debe2e948a563170a';
 let markers = [];
-let offset = '';
 let treeRecords = [];
 let nominating = false;
 let displayFields = [
@@ -49,7 +13,21 @@ let displayFields = [
   'DBH (m)'
 ];
 
+//setup loading screen
+document.addEventListener("DOMContentLoaded", function() {
+  // Show the loading screen
+  document.getElementById("loading-screen").style.display = "flex";
+});
+
 async function fetchTreeRecords() {
+  // Fetch data from Airtable
+  const baseId = 'appQryFCb5Fi3nZ4c';
+  const tableName = 'tbljBWCUMUSwrF2co';
+  const mapViewId = 'viw8Jbt3m4xWa1f1h';
+  const airtableUrl = `https://api.airtable.com/v0/${baseId}/${tableName}?view=${mapViewId}`;
+  const airTablePersonalAccessToken = 'patS6srnbXVthid6g.8b1b2fe74ad1685642ceadbb93e63b8223ee21d14a569f9debe2e948a563170a';
+  let offset = '';
+
   const headers = {
     Authorization: `Bearer ${airTablePersonalAccessToken}`,
   };
@@ -92,18 +70,32 @@ function addTreeMarkers() {
     markers.push(marker);
   });
 
-  let markerLayer = new ol.layer.Vector({
+  let iconStyles = {
+    'Individual Tree': new ol.style.Style({
+      image: new ol.style.Icon({
+        src: 'img/tree.png',
+        anchor: [0.5, 1]
+      })
+    }),
+    'Grove of Trees': new ol.style.Style({
+      image: new ol.style.Icon({
+        src: 'img/forest.png',
+        anchor: [0.5, 1],
+      })
+    })
+  };
+
+  let treeMarkerLayer = new ol.layer.Vector({
     source: new ol.source.Vector({
       features: markers
     }),
     style: function (feature) {
       let iconStyle = iconStyles[feature.get('Category')];
       return iconStyle ? iconStyle : iconStyles["Individual Tree"];
-    },
-    maxResolution: 156543.03392804097
+    }
   });
 
-  var tileLayer = new ol.layer.Tile({
+  let baseTileLayer = new ol.layer.Tile({
     source: new ol.source.OSM({
       attributions: []
     })
@@ -112,12 +104,19 @@ function addTreeMarkers() {
   // Set up the map
   map = new ol.Map({
     target: 'map',
-    layers: [tileLayer, markerLayer],
+    layers: [baseTileLayer, treeMarkerLayer],
     view: new ol.View({
       //center: ol.proj.fromLonLat([-114.337082, 54.678073]),
       zoom: 6, // Set an appropriate zoom level for your data
       enableRotation: false
-    })
+    }),
+    controls: []
+  });
+
+  // Add an event listener for window resize events
+  window.addEventListener('resize', function() {
+    // Update the size of the map
+    map.updateSize();
   });
 
   if(!mobile) {
@@ -138,12 +137,14 @@ function addTreeMarkers() {
   //map.addLayer(markerLayer);
   document.getElementById("loading-screen").style.display = "none";
 
-  // Get the size of the map container element
-  const container = document.getElementById('map');
-  const containerSize = [container.clientWidth, container.clientHeight];
+  map.once('postrender', function(event) {
+    // Get the size of the map container element
+    const container = document.getElementById('map');
+    const containerSize = [container.clientWidth, container.clientHeight];
 
-  // Set the size of the map canvas to match the size of the container element
-  map.setSize(containerSize);
+    // Set the size of the map canvas to match the size of the container element
+    map.setSize(containerSize);
+  });
 }
 
 function setupMapFunctions() {
@@ -206,12 +207,8 @@ function setupMapFunctions() {
         const carouselInner = document.querySelector(".carousel-inner");
         carouselInner.innerHTML = "";
 
-        //const treeImagesContainer = document.getElementById('treeImages');
-
         let photos = feature.get('Photo');
         if (photos) {
-          //treeImagesContainer.style.display = "block";
-
           photos.forEach((image, index) => {
             // create carousel indicator
             const indicator = document.createElement("button");
@@ -254,7 +251,7 @@ function setupMapFunctions() {
           if (document.fullscreenEnabled) {
             carouselImages.forEach((image) => {
               image.style.cursor = 'zoom-in';
-              image.style.maxHeight = '600px';
+              //image.style.maxHeight = '600px';
               image.addEventListener('click', function () {
                 if (!document.fullscreenElement) {
                   image.requestFullscreen();
@@ -286,9 +283,7 @@ function setupMapFunctions() {
           }
           const carousel = new bootstrap.Carousel('#treeCarousel');
         }
-        else {
-          //treeImagesContainer.style.display = "none";
-        }
+
         if (window.matchMedia("(max-width: 767px)").matches) {
           // On mobile devices
           const myDiv = document.getElementById('infoPanel');
@@ -306,6 +301,7 @@ function setupMapFunctions() {
   });
 
   if (!mobile) {
+    // setup mouseover tooltip
     let tooltipOverlay = new ol.Overlay({
       element: document.getElementById('tooltip'),
       positioning: 'bottom-center',
@@ -314,7 +310,6 @@ function setupMapFunctions() {
 
     map.addOverlay(tooltipOverlay);
 
-// setup mouseover tooltip
     map.on('pointermove', function (evt) {
       let feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
         return feature;
