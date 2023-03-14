@@ -476,7 +476,7 @@ function zoomToTree(tree) {
     // Zoom the map to the corresponding feature and display its information
     let feature = treeLayer.getSource().getFeatureById(tree.id ? tree.id : tree.getId());
     let treeExtent = feature.getGeometry().getExtent();
-    map.getView().fit(treeExtent, {duration: 1000, minResolution: map.getView().getResolutionForZoom(16)});
+    map.getView().fit(treeExtent, {duration: 1000, minResolution: map.getView().getZoom() <16 ? map.getView().getResolutionForZoom(16) : map.getView().getResolutionForZoom(map.getView().getZoom())});
     showTreeInfo(feature);
   }
 }
