@@ -446,17 +446,14 @@ function buildLeaderboard() {
 
     // Add a click event listener to each table row
     rowElement.addEventListener('click', function(event) {
-      // Zoom the map to the corresponding feature
+      // Zoom the map to the corresponding feature and display its information
       let feature = treeLayer.getSource().getFeatureById(tree.id);
       let extent = feature.getGeometry().getExtent();
-      //
       map.getView().fit(extent, { duration: 1000, minResolution: map.getView().getResolutionForZoom(16) });
-
-      // Simulate a click event on the feature
       showTreeInfo(feature);
     });
   });
-  // Update Info Panel with Tree Information
+  // Update Info Panel with Leaderboard
   const infoPanel = document.getElementById('infoPanel-content');
   infoPanel.innerHTML = `<p class="treeName"><strong>Top 20 Trees</strong></p>`;
   infoPanel.appendChild(tableElement);
