@@ -254,7 +254,11 @@ function setupMapFunctions() {
               //image.style.maxHeight = '600px';
               image.addEventListener('click', function () {
                 if (!document.fullscreenElement) {
-                  image.requestFullscreen();
+                  if (image.requestFullscreen) {
+                    image.requestFullscreen();
+                  } else if (image.webkitRequestFullscreen) {
+                    image.webkitRequestFullscreen();
+                  }
                   image.style.cursor = 'zoom-out';
                 } else {
                   document.exitFullscreen();
