@@ -455,7 +455,7 @@ function buildLeaderboard() {
   });
   // Update Info Panel with Leaderboard
   const infoPanel = document.getElementById('infoPanel-content');
-  infoPanel.innerHTML = `<p class="treeName"><strong>Top 20 Trees</strong></p>`;
+  infoPanel.innerHTML = `<p class="treeName"><strong>Alberta's (more like Edmonton's) Top Trees</strong></p>`;
   infoPanel.appendChild(tableElement);
 
   scrollInfoPanelUp();
