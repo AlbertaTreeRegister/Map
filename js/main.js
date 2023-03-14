@@ -262,13 +262,13 @@ function showTreeInfo(feature) {
     //set up image carousel
 
     // reset carousel
-    const carouselIndicators = document.querySelector(".carousel-indicators");
-    carouselIndicators.innerHTML = "";
-    const carouselInner = document.querySelector(".carousel-inner");
-    carouselInner.innerHTML = "";
+    resetCarousel();
 
     let photos = feature.get('Photo');
     if (photos) {
+      const carouselIndicators = document.querySelector(".carousel-indicators");
+      const carouselInner = document.querySelector(".carousel-inner");
+
       photos.forEach((image, index) => {
         // create carousel indicator
         const indicator = document.createElement("button");
@@ -396,6 +396,7 @@ function disableNominating()
 }
 
 function buildLeaderboard() {
+  resetCarousel();
   // Create the table element and add it to the container
   let tableElement = document.createElement('table');
   tableElement.classList.add('table');
@@ -456,6 +457,14 @@ function buildLeaderboard() {
   infoPanel.appendChild(tableElement);
 
   scrollInfoPanelUp();
+}
+
+function resetCarousel() {
+  // reset carousel
+  const carouselIndicators = document.querySelector(".carousel-indicators");
+  carouselIndicators.innerHTML = "";
+  const carouselInner = document.querySelector(".carousel-inner");
+  carouselInner.innerHTML = "";
 }
 
 // hide carousel controls by default
