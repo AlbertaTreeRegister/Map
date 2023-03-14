@@ -215,20 +215,26 @@ function setupMapFunctions() {
             indicator.setAttribute("data-bs-target", "#treeCarousel");
             indicator.setAttribute("data-bs-slide-to", index);
             indicator.setAttribute("aria-label", 'Slide ' + (index + 1));
-            if (index === 0) indicator.classList.add("active");
-            carouselIndicators.appendChild(indicator);
 
             // create carousel item
             const item = document.createElement("div");
             item.classList.add("carousel-item");
-            if (index === 0) item.classList.add("active");
 
             // create image element
             const img = document.createElement("img");
             img.classList.add("d-block", "w-100");
             img.src = image.url;
 
+            if (index === 0) {
+              indicator.classList.add("active");
+              item.classList.add("active");
+              img.addEventListener('load', function() {
+                scrollInfoPanelUp();
+              });
+            }
+
             // add image to item and item to inner carousel
+            carouselIndicators.appendChild(indicator);
             item.appendChild(img);
             carouselInner.appendChild(item);
           });
@@ -287,18 +293,8 @@ function setupMapFunctions() {
           }
           const carousel = new bootstrap.Carousel('#treeCarousel');
         }
-
-        if (window.matchMedia("(max-width: 767px)").matches) {
-          // On mobile devices
-          const myDiv = document.getElementById('infoPanel');
-          const rect = myDiv.getBoundingClientRect();
-          const offset = window.pageYOffset;
-          const top = rect.top + offset;
-
-          window.scrollTo({
-            top: top,
-            behavior: 'smooth'
-          });
+        else {
+          scrollInfoPanelUp();
         }
       }
     }
@@ -327,6 +323,21 @@ function setupMapFunctions() {
       } else {
         tooltipOverlay.getElement().style.display = 'none';
       }
+    });
+  }
+}
+
+function scrollInfoPanelUp() {
+  if (window.matchMedia("(max-width: 767px)").matches) {
+    // On mobile devices
+    const myDiv = document.getElementById('infoPanel');
+    const rect = myDiv.getBoundingClientRect();
+    const offset = window.pageYOffset;
+    const top = rect.top + offset;
+
+    window.scrollTo({
+      top: top,
+      behavior: 'smooth'
     });
   }
 }
