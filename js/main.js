@@ -444,7 +444,7 @@ function buildLeaderboard() {
       // Zoom the map to the corresponding feature
       let feature = treeLayer.getSource().getFeatureById(tree.id);
       let extent = feature.getGeometry().getExtent();
-      map.getView().fit(extent, { duration: 2000 });
+      map.getView().fit(extent, { duration: 1500 });
 
       // Simulate a click event on the feature
       showTreeInfo(feature);
