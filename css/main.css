@@ -296,11 +296,6 @@ textarea {
   top: 0;
 }
 
-#credits {
-  position: absolute;
-  bottom: 0;
-}
-
 #infoPanel-content {
   flex: 1;
   padding: 20px;
