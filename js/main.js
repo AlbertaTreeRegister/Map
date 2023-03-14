@@ -135,8 +135,8 @@ function addTreeMarkers() {
       //center: ol.proj.fromLonLat([-114.337082, 54.678073]),
       zoom: 6, // Set an appropriate zoom level for your data
       enableRotation: false,
-      maxZoom: 18,
-      minZoom: 4
+      maxZoom: 19,
+      minZoom: 5
     }),
     controls: []
   });
@@ -404,6 +404,7 @@ function buildLeaderboard() {
   // Create the table header element and add it to the table
   let tableHeaderElement = document.createElement('thead');
   let tableHeaderRowElement = document.createElement('tr');
+  tableHeaderRowElement.style.cursor = 'auto';
   let nameHeaderElement = document.createElement('th');
   nameHeaderElement.innerText = 'Name';
   let scoreHeaderElement = document.createElement('th');
@@ -421,7 +422,7 @@ function buildLeaderboard() {
     return b.fields["Species Score"] - a.fields["Species Score"];
   });
 
-  let topTrees = treeRecords.slice(0,10);
+  let topTrees = treeRecords.slice(0,20);
 
   topTrees.forEach(function(tree) {
     // Create a new row element
@@ -453,7 +454,7 @@ function buildLeaderboard() {
   });
   // Update Info Panel with Tree Information
   const infoPanel = document.getElementById('infoPanel-content');
-  infoPanel.innerHTML = `<p class="treeName"><strong>Species Score Leaders</strong></p>`;
+  infoPanel.innerHTML = `<p class="treeName"><strong>Top 20 Trees</strong></p>`;
   infoPanel.appendChild(tableElement);
 
   scrollInfoPanelUp();
