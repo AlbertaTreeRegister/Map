@@ -1,4 +1,6 @@
-const mobile = window.matchMedia("(max-width: 767px)").matches;
+function isMobile(){
+  return window.matchMedia("(max-width: 767px)").matches;
+}
 let map = '';
 let treeLayer = '';
 let treeRecords = [];
@@ -148,19 +150,7 @@ function addTreeMarkers() {
     map.updateSize();
   });
 
-  if(!mobile) {
-    map.getView().fit([-14590808.089638153,
-      6089851.591243762,
-      -9581431.003940841,
-      8560296.345420659]);
-  }
-  else {
-    map.getView().fit([-13446710.605935464,
-      6181500.185909358,
-      -12105847.751029612,
-      9083264.928320995]);
-  }
-
+  resetMapPosition();
   setupMapFunctions();
 
   //map.addLayer(markerLayer);
@@ -194,7 +184,7 @@ function setupMapFunctions() {
     }
   });
 
-  if (!mobile) {
+  if (!isMobile()) {
     // setup mouseover tooltip
     let tooltipOverlay = new ol.Overlay({
       element: document.getElementById('tooltip'),
@@ -218,6 +208,21 @@ function setupMapFunctions() {
         tooltipOverlay.getElement().style.display = 'none';
       }
     });
+  }
+}
+
+function resetMapPosition() {
+  if(!isMobile()) {
+    map.getView().fit([-14387713.563382847,
+      5974667.065817688,
+      -10632302.157855237,
+      8703494.600378199]);
+  }
+  else {
+    map.getView().fit([-13446710.605935464,
+      6181500.185909358,
+      -12105847.751029612,
+      9083264.928320995]);
   }
 }
 
@@ -361,7 +366,7 @@ function showTreeInfo(feature) {
 }
 
 function scrollInfoPanelUp() {
-  if (window.matchMedia("(max-width: 767px)").matches) {
+  if (isMobile()) {
     // On mobile devices
     const myDiv = document.getElementById('infoPanel');
     const rect = myDiv.getBoundingClientRect();
