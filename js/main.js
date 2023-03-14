@@ -12,6 +12,7 @@ let displayFields = [
   'Canopy Spread (m)',
   'DBH (m)'
 ];
+let topTrees = [];
 
 //setup loading screen
 document.addEventListener("DOMContentLoaded", function() {
@@ -418,11 +419,13 @@ function buildLeaderboard() {
   let tableBodyElement = document.createElement('tbody');
   tableElement.appendChild(tableBodyElement);
 
-  treeRecords.sort(function(a,b){
-    return b.fields["Species Score"] - a.fields["Species Score"];
-  });
+  if(topTrees.length !== 20) {
+    treeRecords.sort(function (a, b) {
+      return b.fields["Species Score"] - a.fields["Species Score"];
+    });
 
-  let topTrees = treeRecords.slice(0,20);
+    topTrees = treeRecords.slice(0, 20);
+  }
 
   topTrees.forEach(function(tree) {
     // Create a new row element
@@ -446,7 +449,8 @@ function buildLeaderboard() {
       // Zoom the map to the corresponding feature
       let feature = treeLayer.getSource().getFeatureById(tree.id);
       let extent = feature.getGeometry().getExtent();
-      map.getView().fit(extent, { duration: 1500 });
+      //
+      map.getView().fit(extent, { duration: 1000, minResolution: map.getView().getResolutionForZoom(16) });
 
       // Simulate a click event on the feature
       showTreeInfo(feature);
