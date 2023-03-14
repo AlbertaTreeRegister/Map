@@ -472,11 +472,13 @@ function resetCarousel() {
 }
 
 function zoomToTree(tree) {
-  // Zoom the map to the corresponding feature and display its information
-  let feature = treeLayer.getSource().getFeatureById(tree.id ? tree.id : tree.getId());
-  let treeExtent = feature.getGeometry().getExtent();
-  map.getView().fit(treeExtent, { duration: 1000, minResolution: map.getView().getResolutionForZoom(16) });
-  showTreeInfo(feature);
+  if (tree) {
+    // Zoom the map to the corresponding feature and display its information
+    let feature = treeLayer.getSource().getFeatureById(tree.id ? tree.id : tree.getId());
+    let treeExtent = feature.getGeometry().getExtent();
+    map.getView().fit(treeExtent, {duration: 1000, minResolution: map.getView().getResolutionForZoom(16)});
+    showTreeInfo(feature);
+  }
 }
 
 // hide carousel controls by default
