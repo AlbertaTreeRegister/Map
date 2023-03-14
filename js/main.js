@@ -177,10 +177,11 @@ function setupMapFunctions() {
       disableNominating();
     }
     else {
-      let feature = map.forEachFeatureAtPixel(event.pixel, function (feature) {
+      let tree = map.forEachFeatureAtPixel(event.pixel, function (feature) {
         return feature;
       });
-      showTreeInfo(feature);
+      zoomToTree(tree);
+      //showTreeInfo(feature);
     }
   });
 
@@ -451,11 +452,7 @@ function buildLeaderboard() {
 
     // Add a click event listener to each table row
     rowElement.addEventListener('click', function(event) {
-      // Zoom the map to the corresponding feature and display its information
-      let feature = treeLayer.getSource().getFeatureById(tree.id);
-      let extent = feature.getGeometry().getExtent();
-      map.getView().fit(extent, { duration: 1000, minResolution: map.getView().getResolutionForZoom(16) });
-      showTreeInfo(feature);
+      zoomToTree(tree);
     });
   });
   // Update Info Panel with Leaderboard
@@ -472,6 +469,14 @@ function resetCarousel() {
   carouselIndicators.innerHTML = "";
   const carouselInner = document.querySelector(".carousel-inner");
   carouselInner.innerHTML = "";
+}
+
+function zoomToTree(tree) {
+  // Zoom the map to the corresponding feature and display its information
+  let feature = treeLayer.getSource().getFeatureById(tree.id ? tree.id : tree.getId());
+  let treeExtent = feature.getGeometry().getExtent();
+  map.getView().fit(treeExtent, { duration: 1000, minResolution: map.getView().getResolutionForZoom(16) });
+  showTreeInfo(feature);
 }
 
 // hide carousel controls by default
