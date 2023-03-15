@@ -1,6 +1,7 @@
-function isMobile(){
+function isMobile() {
   return window.matchMedia("(max-width: 767px)").matches;
 }
+
 let map = '';
 let treeLayer = '';
 let treeRecords = [];
@@ -15,9 +16,10 @@ let displayFields = [
   'DBH (m)'
 ];
 let topTrees = [];
+let treesWithPhotos = [];
 
 //setup loading screen
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   // Show the loading screen
   document.getElementById("loading-screen").style.display = "flex";
 });
@@ -54,11 +56,35 @@ async function fetchTreeRecords() {
   addTreeMarkers();
 }
 
+function getTreeStyle(feature, resolution) {
+  let src = 'img/';
+  src += feature.get('Category') === 'Grove of Trees' ? 'forest.png' : 'tree.png';
+
+  let style = new ol.style.Style({
+    image: new ol.style.Icon({
+      src: src,
+      anchor: [0.5, 1]
+    }),
+    text: new ol.style.Text({
+      font: '14px Calibri,sans-serif',
+      fill: new ol.style.Fill({color: '#000'}),
+      stroke: new ol.style.Stroke({
+        color: '#fff',
+        width: 3,
+      }),
+      offsetY: 18,
+      text: map.getView().getZoom() > 14 ? feature.get('Tree Name') : ''
+    })
+  });
+
+  return style;
+}
+
 function addTreeMarkers() {
   let treeFeatures = [];
 
   // Add markers to the map
-  treeRecords.forEach(function(record) {
+  treeRecords.forEach(function (record) {
     let treeFeature = new ol.Feature({
       geometry: new ol.geom.Point(
         ol.proj.fromLonLat([
@@ -74,38 +100,11 @@ function addTreeMarkers() {
     }
 
     treeFeatures.push(treeFeature);
-  });
 
-  let iconStyles = {
-    'Individual Tree': new ol.style.Style({
-      image: new ol.style.Icon({
-        src: 'img/tree.png',
-        anchor: [0.5, 1]
-      }),
-      text: new ol.style.Text({
-        font: '14px Calibri,sans-serif',
-        fill: new ol.style.Fill({ color: '#000' }),
-        stroke: new ol.style.Stroke({
-          color: '#fff', width: 3
-        }),
-        offsetY: 18,
-      })
-    }),
-    'Grove of Trees': new ol.style.Style({
-      image: new ol.style.Icon({
-        src: 'img/forest.png',
-        anchor: [0.5, 1],
-      }),
-      text: new ol.style.Text({
-        font: '14px Calibri,sans-serif',
-        fill: new ol.style.Fill({ color: '#000' }),
-        stroke: new ol.style.Stroke({
-          color: '#fff', width: 3
-        }),
-        offsetY: 18,
-      })
-    })
-  };
+    if("Photo" in record.fields) {
+      treesWithPhotos.push(record);
+    }
+  });
 
   let baseTileLayer = new ol.layer.Tile({
     source: new ol.source.OSM({
@@ -117,17 +116,7 @@ function addTreeMarkers() {
     source: new ol.source.Vector({
       features: treeFeatures
     }),
-    style: function (feature) {
-      let iconStyle = iconStyles[feature.get('Category')];
-      let style = iconStyle ? iconStyle : iconStyles["Individual Tree"];
-      if(map.getView().getZoom() > 14) {
-        style.getText().setText(feature.get('Tree Name'));
-      }
-      else {
-        style.getText().setText('');
-      }
-      return style;
-    }
+    style: getTreeStyle
   });
 
   // Set up the map
@@ -135,7 +124,6 @@ function addTreeMarkers() {
     target: 'map',
     layers: [baseTileLayer, treeLayer],
     view: new ol.View({
-      //center: ol.proj.fromLonLat([-114.337082, 54.678073]),
       zoom: 6, // Set an appropriate zoom level for your data
       enableRotation: false,
       maxZoom: 19,
@@ -144,40 +132,26 @@ function addTreeMarkers() {
     controls: []
   });
 
-  // Add an event listener for window resize events
-  window.addEventListener('resize', function() {
-    // Update the size of the map
-    map.updateSize();
-  });
-
   resetMapPosition();
   setupMapFunctions();
-
   scrollInfoPanelUp();
+  if(isMobile()) {
+    document.getElementById("basicTutorial").innerHTML = 'Scroll up to view the map. Click on a tree for more information or use the options menu to:'
+
+  }
   document.getElementById("loading-screen").style.display = "none";
-
-
-  map.once('postrender', function(event) {
-    // Get the size of the map container element
-    const container = document.getElementById('map');
-    const containerSize = [container.clientWidth, container.clientHeight];
-
-    // Set the size of the map canvas to match the size of the container element
-    map.setSize(containerSize);
-  });
 }
 
 function setupMapFunctions() {
-  map.on('click', function(event) {
-    if(nominating) {
+  map.on('click', function (event) {
+    if (nominating) {
       const coordinate = event.coordinate;
       const latitude = ol.proj.toLonLat(coordinate)[1];
       const longitude = ol.proj.toLonLat(coordinate)[0];
       const airtableFormUrl = `https://airtable.com/shrT9KRuUUqyMQJ89?prefill_Latitude=${latitude}&prefill_Longitude=${longitude}`;
       window.open(airtableFormUrl, '_blank');
       disableNominating();
-    }
-    else {
+    } else {
       let tree = map.forEachFeatureAtPixel(event.pixel, function (feature) {
         return feature;
       });
@@ -214,13 +188,12 @@ function setupMapFunctions() {
 }
 
 function resetMapPosition() {
-  if(isMobile()) {
+  if (isMobile()) {
     map.getView().fit([-13588363.117644893,
       6014926.988070364,
       -11911787.933140391,
       8916691.730482]);
-  }
-  else {
+  } else {
     map.getView().fit([-14387713.563382847,
       5974667.065817688,
       -10632302.157855237,
@@ -238,15 +211,22 @@ function showTreeInfo(feature) {
       html += `<p>${description}</p>`;
     }
 
-    displayFields.forEach(function(field){
+    displayFields.forEach(function (field) {
       let fieldValue = feature.get(field);
-      if(fieldValue) {
-        html += `<p><strong>${field}:</strong> ${fieldValue}</p>`;
+      if (fieldValue) {
+        if (field.slice(-3) === "(m)") {
+          // convert meters to feet
+          let measureFeet = (fieldValue * 3.28084).toFixed(2);
+          html += `<p><strong>${field}:</strong> ${fieldValue.toFixed(2)} (${measureFeet} ft)</p>`;
+        } else {
+          html += `<p><strong>${field}:</strong> ${fieldValue}</p>`;
+        }
       }
     });
 
     // Update Info Panel with Tree Information
     const infoPanel = document.getElementById('infoPanel-content');
+    infoPanel.style.padding = "20px";
     infoPanel.innerHTML = html;
 
     // Add Google Maps button to bottom of Tree Info
@@ -296,7 +276,7 @@ function showTreeInfo(feature) {
         if (index === 0) {
           indicator.classList.add("active");
           item.classList.add("active");
-          img.addEventListener('load', function() {
+          img.addEventListener('load', function () {
             scrollInfoPanelUp();
           });
         }
@@ -339,29 +319,10 @@ function showTreeInfo(feature) {
               image.style.cursor = 'zoom-in';
             }
           });
-
-          document.addEventListener('fullscreenchange', function () {
-            if (document.fullscreenElement) {
-              image.style.width = '100%';
-              image.style.height = '100%';
-              image.style.position = 'fixed';
-              image.style.top = '0';
-              image.style.left = '0';
-              image.style.zIndex = '9999';
-            } else {
-              image.style.width = '';
-              image.style.height = '';
-              image.style.position = '';
-              image.style.top = '';
-              image.style.left = '';
-              image.style.zIndex = '';
-            }
-          });
         });
       }
       const carousel = new bootstrap.Carousel('#treeCarousel');
-    }
-    else {
+    } else {
       scrollInfoPanelUp();
     }
   }
@@ -372,7 +333,7 @@ function scrollInfoPanelUp() {
     // On mobile devices
     const myDiv = document.getElementById('infoPanel');
     const rect = myDiv.getBoundingClientRect();
-    const offset = window.pageYOffset;
+    const offset = window.scrollY;
     const top = rect.top + offset;
 
     window.scrollTo({
@@ -382,12 +343,10 @@ function scrollInfoPanelUp() {
   }
 }
 
-function activateNominating()
-{
-  if(nominating) {
+function activateNominating() {
+  if (nominating) {
     disableNominating();
-  }
-  else {
+  } else {
     nominating = true;
     const mapElement = document.getElementById('map');
     mapElement.style.cursor = 'crosshair';
@@ -395,15 +354,14 @@ function activateNominating()
   }
 }
 
-function disableNominating()
-{
+function disableNominating() {
   nominating = false;
   const mapElement = document.getElementById('map');
   mapElement.style.cursor = 'auto';
   document.getElementById('nominateBtn').textContent = 'Nominate a Tree';
 }
 
-function buildLeaderboard() {
+function buildTopTrees() {
   resetCarousel();
   // Create the table element and add it to the container
   let tableElement = document.createElement('table');
@@ -426,7 +384,7 @@ function buildLeaderboard() {
   let tableBodyElement = document.createElement('tbody');
   tableElement.appendChild(tableBodyElement);
 
-  if(topTrees.length !== 20) {
+  if (topTrees.length !== 20) {
     treeRecords.sort(function (a, b) {
       return b.fields["Species Score"] - a.fields["Species Score"];
     });
@@ -434,7 +392,7 @@ function buildLeaderboard() {
     topTrees = treeRecords.slice(0, 20);
   }
 
-  topTrees.forEach(function(tree) {
+  topTrees.forEach(function (tree) {
     // Create a new row element
     let rowElement = document.createElement('tr');
     rowElement.setAttribute('data-feature-id', tree.id);
@@ -452,13 +410,14 @@ function buildLeaderboard() {
     tableBodyElement.appendChild(rowElement);
 
     // Add a click event listener to each table row
-    rowElement.addEventListener('click', function(event) {
+    rowElement.addEventListener('click', function (event) {
       zoomToTree(tree);
     });
   });
-  // Update Info Panel with Leaderboard
+  // Update Info Panel with Top Trees
   const infoPanel = document.getElementById('infoPanel-content');
-  infoPanel.innerHTML = `<p class="treeName"><strong>Alberta's (more like Edmonton's) Top Trees</strong></p>`;
+  infoPanel.style.padding = "20px";
+  infoPanel.innerHTML = `<p class="treeName"><strong>Top Ranked Trees</strong></p>`;
   infoPanel.appendChild(tableElement);
 
   scrollInfoPanelUp();
@@ -477,9 +436,58 @@ function zoomToTree(tree) {
     // Zoom the map to the corresponding feature and display its information
     let feature = treeLayer.getSource().getFeatureById(tree.id ? tree.id : tree.getId());
     let treeExtent = feature.getGeometry().getExtent();
-    map.getView().fit(treeExtent, {duration: 1000, minResolution: map.getView().getZoom() <16 ? map.getView().getResolutionForZoom(16) : map.getView().getResolutionForZoom(map.getView().getZoom())});
+    map.getView().fit(treeExtent, {
+      duration: 1000,
+      minResolution: map.getView().getZoom() < 16 ? map.getView().getResolutionForZoom(16) : map.getView().getResolutionForZoom(map.getView().getZoom())
+    });
     showTreeInfo(feature);
   }
+}
+
+function buildPhotoGallery() {
+  resetCarousel();
+  // Update Info Panel with photo gallery
+  const infoPanel = document.getElementById('infoPanel-content');
+  infoPanel.innerHTML = `<p class="treeName"><strong>Photo Gallery</strong></p>`;
+  infoPanel.style.padding = "20px 0 0 0";
+
+  treesWithPhotos.forEach(function (tree) {
+    const treePhoto = document.createElement("img");
+    treePhoto.src = tree.fields["Photo"][0].url;
+    treePhoto.style.width = '100%';
+
+    const treeName = document.createElement("p");
+    treeName.textContent = tree.fields["Tree Name"];
+    treeName.style["text-align"] = 'center';
+    treeName.style["font-weight"] = 'bold';
+    treeName.style.cursor = 'pointer';
+
+    infoPanel.appendChild(treePhoto);
+    infoPanel.appendChild(treeName);
+
+    if (document.fullscreenEnabled) {
+
+      treePhoto.style.cursor = 'zoom-in';
+      treePhoto.addEventListener('click', function () {
+          if (!document.fullscreenElement) {
+            if (treePhoto.requestFullscreen) {
+              treePhoto.requestFullscreen();
+            } else if (treePhoto.webkitRequestFullscreen) {
+              treePhoto.webkitRequestFullscreen();
+            }
+            treePhoto.style.cursor = 'zoom-out';
+          } else {
+            document.exitFullscreen();
+            treePhoto.style.cursor = 'zoom-in';
+          }
+        });
+    }
+
+    // Add a click event listener to each table row
+    treeName.addEventListener('click', function (event) {
+      zoomToTree(tree);
+    });
+  });
 }
 
 // hide carousel controls by default
