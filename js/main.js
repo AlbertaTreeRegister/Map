@@ -217,7 +217,7 @@ function showTreeInfo(feature) {
         if (field.slice(-3) === "(m)") {
           // convert meters to feet
           let measureFeet = (fieldValue * 3.28084).toFixed(2);
-          html += `<p><strong>${field}:</strong> ${fieldValue.toFixed(2)} (${measureFeet} ft)</p>`;
+          html += `<p><strong>${field.slice(0, -4)}:</strong> ${fieldValue.toFixed(2)}m (${measureFeet} ft)</p>`;
         } else {
           html += `<p><strong>${field}:</strong> ${fieldValue}</p>`;
         }
