@@ -456,37 +456,39 @@ function buildPhotoGallery() {
     treePhoto.src = tree.fields["Photo"][0].url;
     treePhoto.style.width = '100%';
 
+    // add fullscreen on click behavior to image
+    if (document.fullscreenEnabled) {
+      treePhoto.style.cursor = 'zoom-in';
+      treePhoto.addEventListener('click', function () {
+        if (!document.fullscreenElement) {
+          if (treePhoto.requestFullscreen) {
+            treePhoto.requestFullscreen();
+          } else if (treePhoto.webkitRequestFullscreen) {
+            treePhoto.webkitRequestFullscreen();
+          }
+          treePhoto.style.cursor = 'zoom-out';
+        } else {
+          document.exitFullscreen();
+          treePhoto.style.cursor = 'zoom-in';
+        }
+      });
+    }
+
+    // create Tree Name paragraph element
     const treeName = document.createElement("p");
     treeName.textContent = tree.fields["Tree Name"];
     treeName.style["text-align"] = 'center';
     treeName.style["font-weight"] = 'bold';
     treeName.style.cursor = 'pointer';
 
-    infoPanel.appendChild(treePhoto);
-    infoPanel.appendChild(treeName);
-
-    if (document.fullscreenEnabled) {
-
-      treePhoto.style.cursor = 'zoom-in';
-      treePhoto.addEventListener('click', function () {
-          if (!document.fullscreenElement) {
-            if (treePhoto.requestFullscreen) {
-              treePhoto.requestFullscreen();
-            } else if (treePhoto.webkitRequestFullscreen) {
-              treePhoto.webkitRequestFullscreen();
-            }
-            treePhoto.style.cursor = 'zoom-out';
-          } else {
-            document.exitFullscreen();
-            treePhoto.style.cursor = 'zoom-in';
-          }
-        });
-    }
-
-    // Add a click event listener to each table row
+    // Zoom to tree when clicking on the Tree Name
     treeName.addEventListener('click', function (event) {
       zoomToTree(tree);
     });
+
+    infoPanel.appendChild(treePhoto);
+    infoPanel.appendChild(treeName);
+    scrollInfoPanelUp();
   });
 }
 
