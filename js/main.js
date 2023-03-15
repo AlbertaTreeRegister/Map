@@ -153,8 +153,9 @@ function addTreeMarkers() {
   resetMapPosition();
   setupMapFunctions();
 
-  //map.addLayer(markerLayer);
+  scrollInfoPanelUp();
   document.getElementById("loading-screen").style.display = "none";
+
 
   map.once('postrender', function(event) {
     // Get the size of the map container element
