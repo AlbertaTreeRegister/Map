@@ -451,10 +451,17 @@ function buildPhotoGallery() {
   infoPanel.innerHTML = `<p class="treeName"><strong>Photo Gallery</strong></p>`;
   infoPanel.style.padding = "20px 0 0 0";
 
-  treesWithPhotos.forEach(function (tree) {
+  treesWithPhotos.forEach(function (tree, index) {
     const treePhoto = document.createElement("img");
     treePhoto.src = tree.fields["Photo"][0].url;
     treePhoto.style.width = '100%';
+
+    // scroll pane up on mobile after image load
+    if(index === treesWithPhotos.length - 1) {
+      treePhoto.addEventListener('load', function () {
+        scrollInfoPanelUp();
+      });
+    }
 
     // add fullscreen on click behavior to image
     if (document.fullscreenEnabled) {
@@ -481,6 +488,7 @@ function buildPhotoGallery() {
     treeName.style["font-weight"] = 'bold';
     treeName.style.cursor = 'pointer';
 
+
     // Zoom to tree when clicking on the Tree Name
     treeName.addEventListener('click', function (event) {
       zoomToTree(tree);
@@ -488,7 +496,6 @@ function buildPhotoGallery() {
 
     infoPanel.appendChild(treePhoto);
     infoPanel.appendChild(treeName);
-    scrollInfoPanelUp();
   });
 }
 
