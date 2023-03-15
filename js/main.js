@@ -136,8 +136,7 @@ function addTreeMarkers() {
   setupMapFunctions();
   scrollInfoPanelUp();
   if(isMobile()) {
-    document.getElementById("basicTutorial").innerHTML = 'Scroll up to view the map. Touch a tree for more information or use the options menu to:'
-
+    document.getElementById("basicTutorial").innerHTML = 'Scroll up to view the map. Touch a tree for more information or use the options menu to:';
   }
   document.getElementById("loading-screen").style.display = "none";
 }
