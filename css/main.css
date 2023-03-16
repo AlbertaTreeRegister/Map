@@ -404,3 +404,32 @@ body {
 tr {
   cursor: pointer;
 }
+
+/* Change the background color of active pagination item */
+.pagination .page-item.active .page-link {
+  background-color: #198754;
+  border-color: #198754;
+}
+
+/* Change the hover background color and text color of pagination items */
+.pagination .page-item:not(.active) .page-link:hover {
+  background-color: rgba(0, 128, 0, 0.1); /* Light green background */
+  color: #198754;
+}
+
+/* Change the focus background color and text color of pagination items */
+.pagination .page-item:not(.active) .page-link:focus {
+  background-color: rgba(0, 128, 0, 0.1); /* Light green background */
+  color: #198754;
+  box-shadow: 0 0 0 0.2rem rgba(0, 128, 0, 0.25); /* Green outline */
+}
+
+/* Change the text color of non-active pagination items */
+.pagination .page-item:not(.active) .page-link {
+  color: #198754;
+}
+
+/* Remove box-shadow from pagination controls */
+.pagination .page-link {
+  box-shadow: none !important;
+}

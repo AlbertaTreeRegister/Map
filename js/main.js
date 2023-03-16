@@ -364,6 +364,7 @@ function buildTopTrees() {
   resetCarousel();
   // Create the table element and add it to the container
   let tableElement = document.createElement('table');
+  tableElement.id = "topTreesTable";
   tableElement.classList.add('table');
 
   // Create the table header element and add it to the table
@@ -505,3 +506,138 @@ carouselNextBtn.style.display = "none";
 carouselPrevBtn.style.display = "none";
 
 fetchTreeRecords();
+
+
+// Pagination 
+
+function createPaginationContainer() {
+  const paginationContainer = document.createElement("div");
+  paginationContainer.classList.add("mt-3");
+
+  const nav = document.createElement("nav");
+  const ul = document.createElement("ul");
+  ul.className = "pagination justify-content-center flex-wrap";
+
+  nav.appendChild(ul);
+  paginationContainer.appendChild(nav);
+  return paginationContainer;
+}
+
+const rowsPerPage = 10; // Set the number of photos per page
+
+function buildPhotoGallery() {
+  resetCarousel();
+  const infoPanel = document.getElementById('infoPanel-content');
+  infoPanel.innerHTML = `<p class="treeName"><strong>Photo Gallery</strong></p>`;
+  infoPanel.style.padding = "20px 0 0 0";
+
+  // Create a wrapper div for the paginated content
+  const paginatedContent = document.createElement("div");
+  paginatedContent.id = "paginatedContent";
+  
+  const paginationTop = createPaginationContainer();
+const paginationBottom = createPaginationContainer();
+infoPanel.appendChild(paginationTop);
+infoPanel.appendChild(paginatedContent);
+infoPanel.appendChild(paginationBottom);
+
+  function displayPhotos(startIndex) {
+    paginatedContent.innerHTML = "";
+    for (let i = startIndex; i < startIndex + rowsPerPage && i < treesWithPhotos.length; i++) {
+      const tree = treesWithPhotos[i];
+      const treePhoto = document.createElement("img");
+      treePhoto.src = tree.fields["Photo"][0].url;
+      treePhoto.style.width = '100%';
+
+      // scroll pane up on mobile after image load
+      //if(index === treesWithPhotos.length - 1) {
+        //treePhoto.addEventListener('load', function () {
+          //scrollInfoPanelUp();
+        //});
+      //}
+
+      // add fullscreen on click behavior to image
+      if (document.fullscreenEnabled) {
+        treePhoto.style.cursor = 'zoom-in';
+        treePhoto.addEventListener('click', function () {
+          if (!document.fullscreenElement) {
+            if (treePhoto.requestFullscreen) {
+              treePhoto.requestFullscreen();
+            } else if (treePhoto.webkitRequestFullscreen) {
+              treePhoto.webkitRequestFullscreen();
+            }
+            treePhoto.style.cursor = 'zoom-out';
+          } else {
+            document.exitFullscreen();
+            treePhoto.style.cursor = 'zoom-in';
+          }
+        });
+      }
+
+      // create Tree Name paragraph element
+      const treeName = document.createElement("p");
+      treeName.textContent = tree.fields["Tree Name"];
+      treeName.style["text-align"] = 'center';
+      treeName.style["font-weight"] = 'bold';
+      treeName.style.cursor = 'pointer';
+
+
+      // Zoom to tree when clicking on the Tree Name
+      treeName.addEventListener('click', function (event) {
+        zoomToTree(tree);
+      });
+      paginatedContent.appendChild(treePhoto);
+      paginatedContent.appendChild(treeName);
+    }
+  }
+
+  function setupPagination() {
+    const ulTop = paginationTop.querySelector("ul");
+    const ulBottom = paginationBottom.querySelector("ul");
+    updatePagination(ulTop);
+    updatePagination(ulBottom);
+  
+    function updatePagination(ul) {
+      ul.innerHTML = ""; // Clear existing pagination items
+      const totalPages = Math.ceil(treesWithPhotos.length / rowsPerPage);
+  
+      for (let i = 1; i <= totalPages; i++) {
+        const li = document.createElement("li");
+        li.className = "page-item";
+        const a = document.createElement("a");
+        a.className = "page-link";
+        a.href = "#";
+        a.textContent = i;
+  
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          const page = parseInt(e.target.textContent);
+          displayPhotos((page - 1) * rowsPerPage);
+          setActivePage(page);
+          scrollInfoPanelUp();
+        });
+  
+        li.appendChild(a);
+        ul.appendChild(li);
+      }
+    }
+  }
+
+  function setActivePage(page) {
+    const pageItemsTop = paginationTop.querySelectorAll(".page-item");
+    const pageItemsBottom = paginationBottom.querySelectorAll(".page-item");
+  
+    updateActivePage(pageItemsTop);
+    updateActivePage(pageItemsBottom);
+  
+    function updateActivePage(pageItems) {
+      pageItems.forEach((item, index) => {
+        item.classList.toggle("active", index === page - 1);
+      });
+    }
+  }
+
+  displayPhotos(0);
+  setupPagination();
+  setActivePage(1);
+}
