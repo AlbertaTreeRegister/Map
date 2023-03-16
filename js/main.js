@@ -640,4 +640,5 @@ infoPanel.appendChild(paginationBottom);
   displayPhotos(0);
   setupPagination();
   setActivePage(1);
+  scrollInfoPanelUp();
 }
