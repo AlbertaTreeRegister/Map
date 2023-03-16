@@ -417,7 +417,7 @@ function buildTopTrees() {
   // Update Info Panel with Top Trees
   const infoPanel = document.getElementById('infoPanel-content');
   infoPanel.style.padding = "20px";
-  infoPanel.innerHTML = `<p class="treeName"><strong>Top Ranked Trees</strong></p>`;
+  infoPanel.innerHTML = `<p class="treeName"><strong>Top Trees</strong></p>`;
   infoPanel.appendChild(tableElement);
 
   scrollInfoPanelUp();
