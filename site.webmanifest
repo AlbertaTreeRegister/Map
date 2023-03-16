@@ -1,12 +1,17 @@
 {
-  "short_name": "",
-  "name": "",
+  "short_name": "ATR Map",
+  "name": "Alberta Tree Registry Map",
   "icons": [{
-    "src": "icon.png",
+    "src": "Alberta-Tree-Registry-favicon-192x192.png",
+    "type": "image/png",
+    "sizes": "192x192"
+  },
+  {
+    "src": "Alberta-Tree-Registry-favicon-512x512.png",
     "type": "image/png",
     "sizes": "192x192"
   }],
   "start_url": "/?utm_source=homescreen",
-  "background_color": "#fafafa",
-  "theme_color": "#fafafa"
+  "background_color": "#198754",
+  "theme_color": "#198754"
 }
