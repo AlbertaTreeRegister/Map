@@ -642,7 +642,7 @@ function buildSearch() {
     tableElement.appendChild(tableBodyElement);
 
     if (results.length === 0) {
-      searchResultsContainer.innerHTML = `<p>No Trees Found.</p>`
+      searchResultsContainer.innerHTML = `<p style="margin: revert;">No Trees Found.</p>`
       return;
     }
 
@@ -671,7 +671,7 @@ function buildSearch() {
     searchResultsContainer.appendChild(tableElement);
     scrollInfoPanelUp();
   }
-  
+
   scrollInfoPanelUp();
 }
 
