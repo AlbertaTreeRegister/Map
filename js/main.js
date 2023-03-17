@@ -615,31 +615,31 @@ function buildSearch() {
 
   const searchResultsContainer = document.createElement("div");
   searchResultsContainer.classList.add("search-results-container")
-  infoPanel.appendChild(searchResultsContainer);  
+  infoPanel.appendChild(searchResultsContainer);
 
   function displaySearchResults(results) {
     searchResultsContainer.innerHTML = "";
     // Create the table element and add it to the container
-  let tableElement = document.createElement('table');
-  tableElement.id = "searchResultsTable";
-  tableElement.classList.add('table');
+    let tableElement = document.createElement('table');
+    tableElement.id = "searchResultsTable";
+    tableElement.classList.add('table');
 
-  // Create the table header element and add it to the table
-  let tableHeaderElement = document.createElement('thead');
-  let tableHeaderRowElement = document.createElement('tr');
-  tableHeaderRowElement.style.cursor = 'auto';
-  let nameHeaderElement = document.createElement('th');
-  nameHeaderElement.innerText = 'Name';
-  let addressHeaderElement = document.createElement('th');
-  addressHeaderElement.innerText = 'Address';
-  tableHeaderRowElement.appendChild(nameHeaderElement);
-  tableHeaderRowElement.appendChild(addressHeaderElement);
-  tableHeaderElement.appendChild(tableHeaderRowElement);
-  tableElement.appendChild(tableHeaderElement);
+    // Create the table header element and add it to the table
+    let tableHeaderElement = document.createElement('thead');
+    let tableHeaderRowElement = document.createElement('tr');
+    tableHeaderRowElement.style.cursor = 'auto';
+    let nameHeaderElement = document.createElement('th');
+    nameHeaderElement.innerText = 'Name';
+    let addressHeaderElement = document.createElement('th');
+    addressHeaderElement.innerText = 'Address';
+    tableHeaderRowElement.appendChild(nameHeaderElement);
+    tableHeaderRowElement.appendChild(addressHeaderElement);
+    tableHeaderElement.appendChild(tableHeaderRowElement);
+    tableElement.appendChild(tableHeaderElement);
 
-  // Create the table body element and add it to the table
-  let tableBodyElement = document.createElement('tbody');
-  tableElement.appendChild(tableBodyElement);
+    // Create the table body element and add it to the table
+    let tableBodyElement = document.createElement('tbody');
+    tableElement.appendChild(tableBodyElement);
 
     if (results.length === 0) {
       searchResultsContainer.innerHTML = `<p>No Trees Found.</p>`
@@ -669,7 +669,10 @@ function buildSearch() {
       });
     });
     searchResultsContainer.appendChild(tableElement);
+    scrollInfoPanelUp();
   }
+  
+  scrollInfoPanelUp();
 }
 
 function searchTrees(query) {
