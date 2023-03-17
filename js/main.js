@@ -154,7 +154,7 @@ function setupMapFunctions() {
       let treeFeature = map.forEachFeatureAtPixel(event.pixel, function (feature) {
         return feature;
       });
-      if(treeFeature) {
+      if (treeFeature) {
         zoomToTree(treeFeature.getId());
       }
     }
@@ -193,7 +193,7 @@ function showTreeInfo(feature) {
           let measureFeet = (fieldValue * 3.28084).toFixed(2);
           html += `<p><strong>${field.slice(0, -4)}:</strong> ${fieldValue.toFixed(2)}m (${measureFeet} ft)</p>`;
         }
-         else {
+        else {
           html += `<p><strong>${field}:</strong> ${fieldValue}</p>`;
         }
       }
@@ -201,13 +201,13 @@ function showTreeInfo(feature) {
 
     // add species info
     let treeSpecies = feature.get('Common Name');
-    if(treeSpecies) {
+    if (treeSpecies) {
       let treeGenus = feature.get('Genus species Text');
 
       html += `<p><strong>Species:</strong> ${treeSpecies} (${treeGenus})</p>`;
 
       let speciesDescription = feature.get('Species Description');
-      if(speciesDescription) {
+      if (speciesDescription) {
         html += `<p>${speciesDescription}</p>`;
       }
     }
@@ -565,4 +565,122 @@ function buildPhotoGallery() {
   setupPagination();
   setActivePage(1);
   scrollInfoPanelUp();
+}
+
+function buildSearch() {
+  resetCarousel();
+  const infoPanel = document.getElementById('infoPanel-content');
+  infoPanel.innerHTML = `<p class="treeName"><strong>Search</strong></p>`;
+  infoPanel.style.padding = "20px";
+
+  const searchContainer = document.createElement("div");
+  searchContainer.classList.add("search-container");
+
+  // Create the input field
+  const searchInput = document.createElement("input");
+  searchInput.type = "text";
+  searchInput.id = "searchInput";
+  searchInput.placeholder = "Search by Name or Address";
+
+  // Create the search button
+  const searchButton = document.createElement("button");
+  searchButton.id = "searchButton";
+  searchButton.classList.add("btn");
+  searchButton.classList.add("btn-success");
+  searchButton.textContent = "Search";
+
+  // Add the input field and search button to search container
+  searchContainer.appendChild(searchInput);
+  searchContainer.appendChild(searchButton);
+  infoPanel.appendChild(searchContainer);
+
+  searchInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      const query = searchInput.value;
+      const results = searchTrees(query);
+
+      // Handle the search results (e.g., display them on the page)
+      displaySearchResults(results);
+    }
+  });
+
+  searchButton.addEventListener("click", () => {
+    const searchInput = document.getElementById("searchInput");
+    const query = searchInput.value;
+    const results = searchTrees(query);
+
+    // Handle the search results (e.g., display them on the page)
+    displaySearchResults(results);
+  });
+
+  const searchResultsContainer = document.createElement("div");
+  searchResultsContainer.classList.add("search-results-container")
+  infoPanel.appendChild(searchResultsContainer);  
+
+  function displaySearchResults(results) {
+    searchResultsContainer.innerHTML = "";
+    // Create the table element and add it to the container
+  let tableElement = document.createElement('table');
+  tableElement.id = "searchResultsTable";
+  tableElement.classList.add('table');
+
+  // Create the table header element and add it to the table
+  let tableHeaderElement = document.createElement('thead');
+  let tableHeaderRowElement = document.createElement('tr');
+  tableHeaderRowElement.style.cursor = 'auto';
+  let nameHeaderElement = document.createElement('th');
+  nameHeaderElement.innerText = 'Name';
+  let addressHeaderElement = document.createElement('th');
+  addressHeaderElement.innerText = 'Address';
+  tableHeaderRowElement.appendChild(nameHeaderElement);
+  tableHeaderRowElement.appendChild(addressHeaderElement);
+  tableHeaderElement.appendChild(tableHeaderRowElement);
+  tableElement.appendChild(tableHeaderElement);
+
+  // Create the table body element and add it to the table
+  let tableBodyElement = document.createElement('tbody');
+  tableElement.appendChild(tableBodyElement);
+
+    if (results.length === 0) {
+      searchResultsContainer.innerHTML = `<p>No Trees Found.</p>`
+      return;
+    }
+
+    results.forEach(tree => {
+      // Create a new row element
+      let rowElement = document.createElement('tr');
+      rowElement.setAttribute('data-feature-id', tree.id);
+
+      // Create new cell elements for each field and add them to the row
+      let nameCell = document.createElement('td');
+      nameCell.innerText = tree.fields["Tree Name"];
+      rowElement.appendChild(nameCell);
+
+      let addressCell = document.createElement('td');
+      addressCell.innerText = tree.fields.Address;
+      rowElement.appendChild(addressCell);
+
+      // Add the row to the table body
+      tableBodyElement.appendChild(rowElement);
+
+      // Add a click event listener to each table row
+      rowElement.addEventListener('click', function (event) {
+        zoomToTree(tree.id);
+      });
+    });
+    searchResultsContainer.appendChild(tableElement);
+  }
+}
+
+function searchTrees(query) {
+  query = query.toLowerCase();
+  return treeRecords.filter(tree => {
+    const name = tree.fields["Tree Name"] ? tree.fields["Tree Name"].toLowerCase() : "";
+    const species = tree.fields.Address ? tree.fields.Address.toLowerCase() : "";
+
+    return (
+      (name && name.includes(query)) ||
+      (species && species.includes(query))
+    );
+  });
 }

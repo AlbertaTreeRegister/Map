@@ -433,3 +433,30 @@ tr {
 .pagination .page-link {
   box-shadow: none !important;
 }
+
+.search-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  max-width: 400px; /* Adjust this value to control the container's width */
+}
+
+#searchInput {
+  flex: 1;
+  margin-right: 10px;
+  border-radius: 5px;
+  border: 1px solid #ced4da;
+  padding: 6px 12px; /* Increase padding to match button's padding */
+  font-size: 16px;
+  height: 38px; /* Adjust height to match the button's height */
+}
+
+#searchButton:hover {
+  background-color: #218838;
+}
+
+#searchButton:active {
+  background-color: #1e7e34;
+}
