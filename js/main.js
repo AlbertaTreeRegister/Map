@@ -335,7 +335,7 @@ function activateNominating() {
     nominating = true;
     const mapElement = document.getElementById('map');
     mapElement.style.cursor = 'crosshair';
-    document.getElementById('nominateBtn').textContent = 'Cancel Nominating';
+    document.getElementById('nominateBtn').textContent = 'Cancel Adding';
   }
 }
 
@@ -343,7 +343,7 @@ function disableNominating() {
   nominating = false;
   const mapElement = document.getElementById('map');
   mapElement.style.cursor = 'auto';
-  document.getElementById('nominateBtn').textContent = 'Nominate a Tree';
+  document.getElementById('nominateBtn').textContent = 'Add a Tree';
 }
 
 function buildTopTrees() {
