@@ -17,6 +17,8 @@ let displayFields = [
 ];
 let topTrees = [];
 let treesWithPhotos = [];
+let addTreeLatitude = 0;
+let addTreeLongitude = 0;
 
 //setup loading screen
 document.addEventListener("DOMContentLoaded", function () {
@@ -138,6 +140,8 @@ function addTreeMarkers() {
   if (isMobile()) {
     document.getElementById("basicTutorial").innerHTML = 'Scroll up to view the map. Select a tree for more information or use the options menu to:';
   }
+
+  // hide the loading screen
   document.getElementById("loading-screen").style.display = "none";
 }
 
@@ -145,10 +149,13 @@ function setupMapFunctions() {
   map.on('click', function (event) {
     if (nominating) {
       const coordinate = event.coordinate;
-      const latitude = ol.proj.toLonLat(coordinate)[1];
-      const longitude = ol.proj.toLonLat(coordinate)[0];
-      const airtableFormUrl = `https://airtable.com/shrT9KRuUUqyMQJ89?prefill_Latitude=${latitude}&prefill_Longitude=${longitude}`;
-      window.open(airtableFormUrl, '_blank');
+      addTreeLatitude = ol.proj.toLonLat(coordinate)[1];
+      addTreeLongitude = ol.proj.toLonLat(coordinate)[0];
+      const selectedLocation = document.getElementById("selectedLocation");
+      selectedLocation.innerHTML = "<p>Selected Location:</p><p>Latitude: " + addTreeLatitude + "<br>Longitude: " + addTreeLongitude + "</p>";
+      zoomToLocation(addTreeLatitude, addTreeLongitude);
+      const confirmLocationButton = document.getElementById("confirmLocationButton");
+      confirmLocationButton.disabled = false;
       disableNominating();
     } else {
       let treeFeature = map.forEachFeatureAtPixel(event.pixel, function (feature) {
@@ -328,24 +335,6 @@ function scrollInfoPanelUp() {
   }
 }
 
-function activateNominating() {
-  if (nominating) {
-    disableNominating();
-  } else {
-    nominating = true;
-    const mapElement = document.getElementById('map');
-    mapElement.style.cursor = 'crosshair';
-    document.getElementById('nominateBtn').textContent = 'Cancel Adding';
-  }
-}
-
-function disableNominating() {
-  nominating = false;
-  const mapElement = document.getElementById('map');
-  mapElement.style.cursor = 'auto';
-  document.getElementById('nominateBtn').textContent = 'Add a Tree';
-}
-
 function buildTopTrees() {
   resetCarousel();
   // Create the table element and add it to the container
@@ -418,7 +407,6 @@ function resetCarousel() {
 }
 
 function zoomToTree(treeId) {
-  //if (treeId) {
   // Zoom the map to the corresponding feature and display its information
   let feature = treeLayer.getSource().getFeatureById(treeId);
   let treeExtent = feature.getGeometry().getExtent();
@@ -427,7 +415,6 @@ function zoomToTree(treeId) {
     minResolution: map.getView().getZoom() < 16 ? map.getView().getResolutionForZoom(16) : map.getView().getResolutionForZoom(map.getView().getZoom())
   });
   showTreeInfo(feature);
-  //}
 }
 
 // hide carousel controls by default
@@ -642,7 +629,8 @@ function buildSearch() {
     tableElement.appendChild(tableBodyElement);
 
     if (results.length === 0) {
-      searchResultsContainer.innerHTML = `<p style="margin: revert;">No Trees Found.</p>`
+      searchResultsContainer.innerHTML = `<p style="margin: revert;">No Trees Found.</p>`;
+      scrollInfoPanelUp();
       return;
     }
 
@@ -679,11 +667,134 @@ function searchTrees(query) {
   query = query.toLowerCase();
   return treeRecords.filter(tree => {
     const name = tree.fields["Tree Name"] ? tree.fields["Tree Name"].toLowerCase() : "";
-    const species = tree.fields.Address ? tree.fields.Address.toLowerCase() : "";
+    const address = tree.fields.Address ? tree.fields.Address.toLowerCase() : "";
 
     return (
       (name && name.includes(query)) ||
-      (species && species.includes(query))
+      (address && address.includes(query))
     );
+  });
+}
+
+function buildAddATree() {
+  resetCarousel();
+  const infoPanel = document.getElementById('infoPanel-content');
+  infoPanel.innerHTML = `<p class="treeName"><strong>Add a Tree</strong></p><p>To add a tree, first locate the tree using either your current gps coordinates, or select the location of the tree on the map. Once you've located the tree, the Add button will open a nomination form in a new window and ask you for additional information about the tree. Please be as thorough as possible to increase the chance that your submission will be verified and added to the register.</p>`;
+  //infoPanel.innerHTML += ``;
+  infoPanel.style.padding = "20px";
+
+  // Create a new div element
+  const addTreeContainer = document.createElement("div");
+
+  // Add Bootstrap class for vertical stacking of buttons
+  addTreeContainer.classList.add("d-grid", "gap-4");
+
+  // Create the Current Location button
+  const currentLocationButton = document.createElement("button");
+  currentLocationButton.classList.add("btn", "btn-primary");
+  currentLocationButton.textContent = "Current Location";
+
+  // Create the Select Location button
+  const selectLocationButton = document.createElement("button");
+  selectLocationButton.id = "selectLocationButton"
+  selectLocationButton.classList.add("btn", "btn-dark");
+  selectLocationButton.textContent = "Select Location";
+
+  // Create the error message div element
+  const selectedLocationMessage = document.createElement("div");
+  selectedLocationMessage.id = 'selectedLocation';
+
+  // Create the Confirm Location button
+  const confirmLocationButton = document.createElement("button");
+  confirmLocationButton.id = "confirmLocationButton"
+  confirmLocationButton.classList.add("btn", "btn-success");
+  confirmLocationButton.textContent = "Add";
+  confirmLocationButton.disabled = true;
+
+  // Append the buttons to the new div
+  addTreeContainer.appendChild(currentLocationButton);
+  addTreeContainer.appendChild(selectLocationButton);
+  addTreeContainer.appendChild(selectedLocationMessage);
+  addTreeContainer.appendChild(confirmLocationButton);
+
+  // Append the new div to the container
+  infoPanel.appendChild(addTreeContainer);
+
+  // Function to get current location using Geolocation API
+  function getCurrentLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(selectPosition, showError);
+    } else {
+      selectedLocationMessage.innerHTML = "Geolocation is not supported by this browser.";
+    }
+  }
+
+  // Function to show position
+  function selectPosition(position) {
+    addTreeLatitude = position.coords.latitude;
+    addTreeLongitude = position.coords.longitude;
+    selectedLocationMessage.innerHTML = "<p>Selected Location:</p><p>Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude + "</p>";
+    zoomToLocation(addTreeLatitude, addTreeLongitude);
+    confirmLocationButton.disabled = false;
+    scrollInfoPanelUp();
+  }
+
+  // Function to handle errors
+  function showError(error) {
+    switch (error.code) {
+      case error.PERMISSION_DENIED:
+        selectedLocationMessage.innerHTML = "User denied the request for Geolocation.";
+        break;
+      case error.POSITION_UNAVAILABLE:
+        selectedLocationMessage.innerHTML = "Location information is unavailable.";
+        break;
+      case error.TIMEOUT:
+        selectedLocationMessage.innerHTML = "The request to get user location timed out.";
+        break;
+      case error.UNKNOWN_ERROR:
+        selectedLocationMessage.innerHTML = "An unknown error occurred.";
+        break;
+    }
+  }
+
+  // Add event listeners for the buttons
+  currentLocationButton.addEventListener("click", getCurrentLocation);
+  selectLocationButton.addEventListener("click", activateNominating);
+  confirmLocationButton.addEventListener("click", addTreeAtLocation);
+  scrollInfoPanelUp();
+}
+
+function addTreeAtLocation() {
+  if(addTreeLatitude !== 0 || addTreeLongitude !== 0) {
+  const airtableFormUrl = `https://airtable.com/shrT9KRuUUqyMQJ89?prefill_Latitude=${addTreeLatitude}&prefill_Longitude=${addTreeLongitude}`;
+  window.open(airtableFormUrl, '_blank');
+  }
+}
+
+function activateNominating() {
+  if (nominating) {
+    disableNominating();
+  } else {
+    nominating = true;
+    const mapElement = document.getElementById('map');
+    mapElement.style.cursor = 'crosshair';
+    document.getElementById('selectLocationButton').textContent = 'Cancel';
+  }
+}
+
+function disableNominating() {
+  nominating = false;
+  const mapElement = document.getElementById('map');
+  mapElement.style.cursor = 'auto';
+  document.getElementById('selectLocationButton').textContent = 'Select Location';
+}
+
+function zoomToLocation(latitude, longitude) {
+  const view = map.getView();
+  const coordinates = ol.proj.fromLonLat([longitude, latitude]);
+  view.animate({
+    center: coordinates,
+    zoom: map.getView().getZoom() < 16 ? 16 : map.getView().getZoom(),
+    duration: 1000
   });
 }
