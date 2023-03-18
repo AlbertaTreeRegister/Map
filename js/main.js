@@ -691,7 +691,7 @@ function buildAddATree() {
 
   // Create the Current Location button
   const currentLocationButton = document.createElement("button");
-  currentLocationButton.classList.add("btn", "btn-primary");
+  currentLocationButton.classList.add("btn", "btn-success");
   currentLocationButton.textContent = "Current Location";
 
   // Create the Select Location button
