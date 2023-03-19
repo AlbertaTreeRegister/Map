@@ -696,7 +696,7 @@ function buildAddATree() {
   resetCarousel();
   clearSelectedLocation();
   const infoPanel = document.getElementById('infoPanel-content');
-  infoPanel.innerHTML = `<p class="treeName"><strong>Add a Tree</strong></p><p>To add a tree, first locate the tree using either your current GPS coordinates or by selecting the location of the tree on the map. Once you've located the tree, the "Add" button will open a nomination form in a new window and ask you for additional information about the tree. Please be as thorough as possible to increase the chance that your submission will be verified and added to the register.</p>`;
+  infoPanel.innerHTML = `<p class="treeName"><strong>Add a Tree</strong></p><p>To add a tree, first locate the tree using either your current GPS coordinates or by selecting the location of the tree on the map. Once you've located the tree, the "Add Tree" button will open a nomination form in a new window and ask you for additional information about the tree. Please be as thorough as possible to increase the chance that your submission will be verified and added to the register.</p>`;
   //infoPanel.innerHTML += ``;
   infoPanel.style.padding = "20px";
 
@@ -726,7 +726,7 @@ function buildAddATree() {
   const confirmLocationButton = document.createElement("button");
   confirmLocationButton.id = "confirmLocationButton"
   confirmLocationButton.classList.add("btn", "btn-success");
-  confirmLocationButton.textContent = "Add";
+  confirmLocationButton.textContent = "Add Tree";
   confirmLocationButton.disabled = true;
 
   // Append the buttons to the new div
