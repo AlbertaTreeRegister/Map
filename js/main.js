@@ -5,7 +5,7 @@ function isMobile() {
 let map = '';
 let treeLayer = '';
 let treeRecords = [];
-let nominating = false;
+let selectingLocation = false;
 let displayFields = [
   'Address',
   'Age',
@@ -19,6 +19,8 @@ let topTrees = [];
 let treesWithPhotos = [];
 let addTreeLatitude = 0;
 let addTreeLongitude = 0;
+let addTreeLayer;
+let addTreeSource;
 
 //setup loading screen
 document.addEventListener("DOMContentLoaded", function () {
@@ -121,10 +123,25 @@ function addTreeMarkers() {
     style: getTreeStyle
   });
 
+  addTreeSource = new ol.source.Vector();
+
+  addTreeLayer = new ol.layer.Vector({
+    source: addTreeSource,
+    style: new ol.style.Style({
+      fill: new ol.style.Fill({
+        color: 'rgba(255, 0, 0, 0.2)', // Fill color in RGBA format
+      }),
+      stroke: new ol.style.Stroke({
+        color: 'red', // Stroke color
+        width: 2, // Stroke width
+      }),
+    })
+  });
+
   // Set up the map
   map = new ol.Map({
     target: 'map',
-    layers: [baseTileLayer, treeLayer],
+    layers: [baseTileLayer, treeLayer, addTreeLayer],
     view: new ol.View({
       zoom: 6,
       enableRotation: false,
@@ -147,16 +164,12 @@ function addTreeMarkers() {
 
 function setupMapFunctions() {
   map.on('click', function (event) {
-    if (nominating) {
+    if (selectingLocation) {
       const coordinate = event.coordinate;
       addTreeLatitude = ol.proj.toLonLat(coordinate)[1];
       addTreeLongitude = ol.proj.toLonLat(coordinate)[0];
-      const selectedLocation = document.getElementById("selectedLocation");
-      selectedLocation.innerHTML = "<p>Selected Location:</p><p>Latitude: " + addTreeLatitude + "<br>Longitude: " + addTreeLongitude + "</p>";
-      zoomToLocation(addTreeLatitude, addTreeLongitude);
-      const confirmLocationButton = document.getElementById("confirmLocationButton");
-      confirmLocationButton.disabled = false;
-      disableNominating();
+      setSelectedLocation();
+      disableSelectingLocation();
     } else {
       let treeFeature = map.forEachFeatureAtPixel(event.pixel, function (feature) {
         return feature;
@@ -337,6 +350,7 @@ function scrollInfoPanelUp() {
 
 function buildTopTrees() {
   resetCarousel();
+  clearSelectedLocation();
   // Create the table element and add it to the container
   let tableElement = document.createElement('table');
   tableElement.id = "topTreesTable";
@@ -445,6 +459,7 @@ const rowsPerPage = 10; // Set the number of photos per page
 
 function buildPhotoGallery() {
   resetCarousel();
+  clearSelectedLocation();
   const infoPanel = document.getElementById('infoPanel-content');
   infoPanel.innerHTML = `<p class="treeName"><strong>Photo Gallery</strong></p>`;
   infoPanel.style.padding = "20px 0 0 0";
@@ -556,6 +571,7 @@ function buildPhotoGallery() {
 
 function buildSearch() {
   resetCarousel();
+  clearSelectedLocation();
   const infoPanel = document.getElementById('infoPanel-content');
   infoPanel.innerHTML = `<p class="treeName"><strong>Search</strong></p>`;
   infoPanel.style.padding = "20px";
@@ -678,6 +694,7 @@ function searchTrees(query) {
 
 function buildAddATree() {
   resetCarousel();
+  clearSelectedLocation();
   const infoPanel = document.getElementById('infoPanel-content');
   infoPanel.innerHTML = `<p class="treeName"><strong>Add a Tree</strong></p><p>To add a tree, first locate the tree using either your current gps coordinates, or select the location of the tree on the map. Once you've located the tree, the Add button will open a nomination form in a new window and ask you for additional information about the tree. Please be as thorough as possible to increase the chance that your submission will be verified and added to the register.</p>`;
   //infoPanel.innerHTML += ``;
@@ -722,20 +739,19 @@ function buildAddATree() {
 
   // Function to get current location using Geolocation API
   function getCurrentLocation() {
+    disableSelectingLocation();
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(selectPosition, showError);
+      navigator.geolocation.getCurrentPosition(selectCurrentPosition, showError);
     } else {
       selectedLocationMessage.innerHTML = "Geolocation is not supported by this browser.";
     }
   }
 
-  // Function to show position
-  function selectPosition(position) {
+  // Function to Select Current Position
+  function selectCurrentPosition(position) {
     addTreeLatitude = position.coords.latitude;
     addTreeLongitude = position.coords.longitude;
-    selectedLocationMessage.innerHTML = "<p>Selected Location:</p><p>Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude + "</p>";
-    zoomToLocation(addTreeLatitude, addTreeLongitude);
-    confirmLocationButton.disabled = false;
+    setSelectedLocation();
     scrollInfoPanelUp();
   }
 
@@ -759,42 +775,53 @@ function buildAddATree() {
 
   // Add event listeners for the buttons
   currentLocationButton.addEventListener("click", getCurrentLocation);
-  selectLocationButton.addEventListener("click", activateNominating);
+  selectLocationButton.addEventListener("click", enableSelectingLocation);
   confirmLocationButton.addEventListener("click", addTreeAtLocation);
   scrollInfoPanelUp();
 }
 
 function addTreeAtLocation() {
-  if(addTreeLatitude !== 0 || addTreeLongitude !== 0) {
-  const airtableFormUrl = `https://airtable.com/shrT9KRuUUqyMQJ89?prefill_Latitude=${addTreeLatitude}&prefill_Longitude=${addTreeLongitude}`;
-  window.open(airtableFormUrl, '_blank');
+  if (addTreeLatitude !== 0 || addTreeLongitude !== 0) {
+    const airtableFormUrl = `https://airtable.com/shrT9KRuUUqyMQJ89?prefill_Latitude=${addTreeLatitude}&prefill_Longitude=${addTreeLongitude}`;
+    window.open(airtableFormUrl, '_blank');
   }
 }
 
-function activateNominating() {
-  if (nominating) {
-    disableNominating();
+function enableSelectingLocation() {
+  if (selectingLocation) {
+    disableSelectingLocation();
   } else {
-    nominating = true;
+    selectingLocation = true;
     const mapElement = document.getElementById('map');
     mapElement.style.cursor = 'crosshair';
     document.getElementById('selectLocationButton').textContent = 'Cancel';
   }
 }
 
-function disableNominating() {
-  nominating = false;
+function disableSelectingLocation() {
+  selectingLocation = false;
   const mapElement = document.getElementById('map');
   mapElement.style.cursor = 'auto';
   document.getElementById('selectLocationButton').textContent = 'Select Location';
 }
 
-function zoomToLocation(latitude, longitude) {
-  const view = map.getView();
-  const coordinates = ol.proj.fromLonLat([longitude, latitude]);
-  view.animate({
-    center: coordinates,
-    zoom: map.getView().getZoom() < 16 ? 16 : map.getView().getZoom(),
+function setSelectedLocation() {
+  const selectedLocation = document.getElementById("selectedLocation");
+  selectedLocation.innerHTML = "<p>Selected Location:</p><p>Latitude: " + addTreeLatitude.toFixed(4) + "<br>Longitude: " + addTreeLongitude.toFixed(4) + "</p>";
+  addTreeSource.clear();
+  let center = ol.proj.fromLonLat([addTreeLongitude, addTreeLatitude]);
+  const circleGeometry = new ol.geom.Circle(center, 3);
+  const circleFeature = new ol.Feature(circleGeometry);
+  addTreeSource.addFeature(circleFeature);
+  map.getView().animate({
+    center: center,
+    zoom: 19,
     duration: 1000
   });
+  const confirmLocationButton = document.getElementById("confirmLocationButton");
+  confirmLocationButton.disabled = false;
+}
+
+function clearSelectedLocation() {
+  addTreeSource.clear();
 }
