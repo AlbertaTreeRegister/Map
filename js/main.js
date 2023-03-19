@@ -166,8 +166,8 @@ function setupMapFunctions() {
   map.on('click', function (event) {
     if (selectingLocation) {
       const coordinate = event.coordinate;
-      addTreeLatitude = ol.proj.toLonLat(coordinate)[1];
-      addTreeLongitude = ol.proj.toLonLat(coordinate)[0];
+      addTreeLatitude = ol.proj.toLonLat(coordinate)[1].toFixed(5);
+      addTreeLongitude = ol.proj.toLonLat(coordinate)[0].toFixed(5);
       setSelectedLocation();
       disableSelectingLocation();
     } else {
@@ -720,6 +720,7 @@ function buildAddATree() {
   // Create the error message div element
   const selectedLocationMessage = document.createElement("div");
   selectedLocationMessage.id = 'selectedLocation';
+  selectedLocationMessage.innerHTML = 'No Selected Location.';
 
   // Create the Confirm Location button
   const confirmLocationButton = document.createElement("button");
@@ -749,8 +750,8 @@ function buildAddATree() {
 
   // Function to Select Current Position
   function selectCurrentPosition(position) {
-    addTreeLatitude = position.coords.latitude;
-    addTreeLongitude = position.coords.longitude;
+    addTreeLatitude = position.coords.latitude.toFixed(5);
+    addTreeLongitude = position.coords.longitude.toFixed(5);
     setSelectedLocation();
     scrollInfoPanelUp();
   }
@@ -808,7 +809,7 @@ function disableSelectingLocation() {
 function setSelectedLocation() {
   clearSelectedLocation();
   const selectedLocation = document.getElementById("selectedLocation");
-  selectedLocation.innerHTML = "<p>Selected Location:</p><p>Latitude: " + addTreeLatitude.toFixed(4) + "<br>Longitude: " + addTreeLongitude.toFixed(4) + "</p>";
+  selectedLocation.innerHTML = "<p>Selected Location:</p><p>Latitude: " + addTreeLatitude + "<br>Longitude: " + addTreeLongitude + "</p>";
   let center = ol.proj.fromLonLat([addTreeLongitude, addTreeLatitude]);
   const circleGeometry = new ol.geom.Circle(center, 3);
   const circleFeature = new ol.Feature(circleGeometry);
