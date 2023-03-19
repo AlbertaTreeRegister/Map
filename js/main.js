@@ -696,7 +696,7 @@ function buildAddATree() {
   resetCarousel();
   clearSelectedLocation();
   const infoPanel = document.getElementById('infoPanel-content');
-  infoPanel.innerHTML = `<p class="treeName"><strong>Add a Tree</strong></p><p>To add a tree, first locate the tree using either your current gps coordinates, or select the location of the tree on the map. Once you've located the tree, the Add button will open a nomination form in a new window and ask you for additional information about the tree. Please be as thorough as possible to increase the chance that your submission will be verified and added to the register.</p>`;
+  infoPanel.innerHTML = `<p class="treeName"><strong>Add a Tree</strong></p><p>To add a tree, first locate the tree using either your current GPS coordinates or by selecting the location of the tree on the map. Once you've located the tree, the "Add" button will open a nomination form in a new window and ask you for additional information about the tree. Please be as thorough as possible to increase the chance that your submission will be verified and added to the register.</p>`;
   //infoPanel.innerHTML += ``;
   infoPanel.style.padding = "20px";
 
@@ -806,9 +806,9 @@ function disableSelectingLocation() {
 }
 
 function setSelectedLocation() {
+  clearSelectedLocation();
   const selectedLocation = document.getElementById("selectedLocation");
   selectedLocation.innerHTML = "<p>Selected Location:</p><p>Latitude: " + addTreeLatitude.toFixed(4) + "<br>Longitude: " + addTreeLongitude.toFixed(4) + "</p>";
-  addTreeSource.clear();
   let center = ol.proj.fromLonLat([addTreeLongitude, addTreeLatitude]);
   const circleGeometry = new ol.geom.Circle(center, 3);
   const circleFeature = new ol.Feature(circleGeometry);
