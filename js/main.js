@@ -583,7 +583,6 @@ function buildSearch() {
   const searchInput = document.createElement("input");
   searchInput.type = "text";
   searchInput.id = "searchInput";
-  searchInput.placeholder = "Search by Name or Address";
 
   // Create the search button
   const searchButton = document.createElement("button");
@@ -684,10 +683,12 @@ function searchTrees(query) {
   return treeRecords.filter(tree => {
     const name = tree.fields["Tree Name"] ? tree.fields["Tree Name"].toLowerCase() : "";
     const address = tree.fields.Address ? tree.fields.Address.toLowerCase() : "";
+    const neighbourhood = tree.fields["Neighbourhood Text"] && tree.fields["Neighbourhood Text"][0] ? tree.fields["Neighbourhood Text"][0].toLowerCase() : "";
 
     return (
       (name && name.includes(query)) ||
-      (address && address.includes(query))
+      (address && address.includes(query)) || 
+      (neighbourhood && neighbourhood.includes(query))
     );
   });
 }
