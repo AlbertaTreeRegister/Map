@@ -19,7 +19,6 @@ let topTrees = [];
 let treesWithPhotos = [];
 let addTreeLatitude = 0;
 let addTreeLongitude = 0;
-let addTreeLayer;
 let addTreeSource;
 
 //setup loading screen
@@ -125,15 +124,15 @@ function addTreeMarkers() {
 
   addTreeSource = new ol.source.Vector();
 
-  addTreeLayer = new ol.layer.Vector({
+  let addTreeLayer = new ol.layer.Vector({
     source: addTreeSource,
     style: new ol.style.Style({
       fill: new ol.style.Fill({
-        color: 'rgba(255, 0, 0, 0.2)', // Fill color in RGBA format
+        color: 'rgba(255, 0, 0, 0.2)',
       }),
       stroke: new ol.style.Stroke({
-        color: 'red', // Stroke color
-        width: 2, // Stroke width
+        color: 'red',
+        width: 2,
       }),
     })
   });
@@ -152,7 +151,7 @@ function addTreeMarkers() {
   });
 
   resetMapPosition();
-  setupMapFunctions();
+  setupMapEvents();
   scrollInfoPanelUp();
   if (isMobile()) {
     document.getElementById("basicTutorial").innerHTML = 'Scroll up to view the map. Select a tree for more information or use the options menu to:';
@@ -162,7 +161,22 @@ function addTreeMarkers() {
   document.getElementById("loading-screen").style.display = "none";
 }
 
-function setupMapFunctions() {
+function resetMapPosition() {
+  // default position shows all of Alberta
+  if (isMobile()) {
+    map.getView().fit([-13588363.117644893,
+      6014926.988070364,
+    -11911787.933140391,
+      8916691.730482]);
+  } else {
+    map.getView().fit([-14387713.563382847,
+      5974667.065817688,
+    -10632302.157855237,
+      8703494.600378199]);
+  }
+}
+
+function setupMapEvents() {
   map.on('click', function (event) {
     if (selectingLocation) {
       const coordinate = event.coordinate;
@@ -181,17 +195,17 @@ function setupMapFunctions() {
   });
 }
 
-function resetMapPosition() {
+function scrollInfoPanelUp() {
   if (isMobile()) {
-    map.getView().fit([-13588363.117644893,
-      6014926.988070364,
-    -11911787.933140391,
-      8916691.730482]);
-  } else {
-    map.getView().fit([-14387713.563382847,
-      5974667.065817688,
-    -10632302.157855237,
-      8703494.600378199]);
+    const myDiv = document.getElementById('infoPanel');
+    const rect = myDiv.getBoundingClientRect();
+    const offset = window.scrollY;
+    const top = rect.top + offset;
+
+    window.scrollTo({
+      top: top,
+      behavior: 'smooth'
+    });
   }
 }
 
@@ -220,11 +234,9 @@ function showTreeInfo(feature) {
     });
 
     // add species info
-    let treeSpecies = feature.get('Common Name');
-    if (treeSpecies) {
-      let treeGenus = feature.get('Genus species Text');
-
-      html += `<p><strong>Species:</strong> ${treeSpecies} (${treeGenus})</p>`;
+    let treeGenus = feature.get('Genus species Text');
+    if (treeGenus) {
+      html += `<p><strong>Species:</strong> ${treeGenus}</p>`;
 
       let speciesDescription = feature.get('Species Description');
       if (speciesDescription) {
@@ -245,8 +257,8 @@ function showTreeInfo(feature) {
     let googleMapsIcon = '<img id="googleMapsIcon" src="img/google-maps-old.svg" style="width: 48px; height: 48px">';
     googleMapsButton.innerHTML = googleMapsIcon;
     googleMapsButton.addEventListener('click', function () {
-      let latitude = feature.get('Latitude'); // replace with the latitude of the location
-      let longitude = feature.get('Longitude'); // replace with the longitude of the location
+      let latitude = feature.get('Latitude');
+      let longitude = feature.get('Longitude');
       let url = 'https://www.google.com/maps/search/?api=1&query=' + latitude + '%2C' + longitude;
       window.open(url);
     });
@@ -333,22 +345,7 @@ function showTreeInfo(feature) {
   }
 }
 
-function scrollInfoPanelUp() {
-  if (isMobile()) {
-    // On mobile devices
-    const myDiv = document.getElementById('infoPanel');
-    const rect = myDiv.getBoundingClientRect();
-    const offset = window.scrollY;
-    const top = rect.top + offset;
-
-    window.scrollTo({
-      top: top,
-      behavior: 'smooth'
-    });
-  }
-}
-
-function buildTopTrees() {
+function showTopTrees() {
   resetCarousel();
   clearSelectedLocation();
   // Create the table element and add it to the container
@@ -413,7 +410,6 @@ function buildTopTrees() {
 }
 
 function resetCarousel() {
-  // reset carousel
   const carouselIndicators = document.querySelector(".carousel-indicators");
   carouselIndicators.innerHTML = "";
   const carouselInner = document.querySelector(".carousel-inner");
@@ -430,15 +426,6 @@ function zoomToTree(treeId) {
   });
   showTreeInfo(feature);
 }
-
-// hide carousel controls by default
-const carouselNextBtn = document.querySelector(".carousel-control-next");
-const carouselPrevBtn = document.querySelector(".carousel-control-prev");
-carouselNextBtn.style.display = "none";
-carouselPrevBtn.style.display = "none";
-
-fetchTreeRecords();
-
 
 // Pagination 
 
@@ -457,7 +444,7 @@ function createPaginationContainer() {
 
 const rowsPerPage = 10; // Set the number of photos per page
 
-function buildPhotoGallery() {
+function showPhotoGallery() {
   resetCarousel();
   clearSelectedLocation();
   const infoPanel = document.getElementById('infoPanel-content');
@@ -569,7 +556,7 @@ function buildPhotoGallery() {
   scrollInfoPanelUp();
 }
 
-function buildSearch() {
+function showSearch() {
   resetCarousel();
   clearSelectedLocation();
   const infoPanel = document.getElementById('infoPanel-content');
@@ -693,12 +680,11 @@ function searchTrees(query) {
   });
 }
 
-function buildAddATree() {
+function showAddATree() {
   resetCarousel();
   clearSelectedLocation();
   const infoPanel = document.getElementById('infoPanel-content');
   infoPanel.innerHTML = `<p class="treeName"><strong>Add a Tree</strong></p><p>To add a tree, first locate the tree using either your current GPS coordinates or by selecting the location of the tree on the map. Once you've located the tree, the "Add Tree" button will open a nomination form in a new window and ask you for additional information about the tree. Please be as thorough as possible to increase the chance that your submission will be verified and added to the register.</p>`;
-  //infoPanel.innerHTML += ``;
   infoPanel.style.padding = "20px";
 
   // Create a new div element
@@ -827,3 +813,11 @@ function setSelectedLocation() {
 function clearSelectedLocation() {
   addTreeSource.clear();
 }
+
+// hide carousel controls by default
+const carouselNextBtn = document.querySelector(".carousel-control-next");
+const carouselPrevBtn = document.querySelector(".carousel-control-prev");
+carouselNextBtn.style.display = "none";
+carouselPrevBtn.style.display = "none";
+
+fetchTreeRecords();

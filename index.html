@@ -43,10 +43,10 @@
             Options
           </button>
           <ul class="dropdown-menu dropdown-menu-dark">
-            <li><a class="dropdown-item" onclick="buildSearch()">Search</a></li>
-            <li><a class="dropdown-item" onclick="buildTopTrees()">Top Trees</a></li>
-            <li><a class="dropdown-item" onclick="buildPhotoGallery()">Photo Gallery</a></li>
-            <li><a id="nominateBtn" class="dropdown-item" onclick="buildAddATree()">Add a Tree</a></li>
+            <li><a class="dropdown-item" onclick="showSearch()">Search</a></li>
+            <li><a class="dropdown-item" onclick="showTopTrees()">Top Trees</a></li>
+            <li><a class="dropdown-item" onclick="showPhotoGallery()">Photo Gallery</a></li>
+            <li><a id="nominateBtn" class="dropdown-item" onclick="showAddATree()">Add a Tree</a></li>
             <li><a class="dropdown-item" onclick="resetMapPosition()">Reset Map</a></li>
           </ul>
         </div>
@@ -73,7 +73,7 @@
       <div id="infoPanel-content">
         <p class="treeName"><strong>Welcome to the Alberta Tree Register Map</strong></p>
         <p id="basicTutorial">Select a tree on the map for more information or use the options menu to:</p>
-        <p>1) Search for a tree by its name, address, or location.</p>
+        <p>1) Search for a tree by its name, address, or neighbourhood.</p>
         <p>2) View a list of the top trees. Select a tree to navigate to its location.</p>
         <p>3) View the photo gallery. Select an image to view it in fullscreen (desktop only) or select the tree name for more information.</p>
         <p>4) Add a tree to the register.</p>
