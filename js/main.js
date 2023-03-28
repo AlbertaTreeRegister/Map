@@ -342,13 +342,12 @@ function showTreeInfo(feature) {
         carouselNextBtn.style.display = "";
         carouselPrevBtn.style.display = "";
       }
-
+      
       // Click to Fullscreen images
-      const carouselImages = document.querySelectorAll(
-        "#treeCarousel .carousel-item img"
-      );
-
       if (document.fullscreenEnabled) {
+        const carouselImages = document.querySelectorAll(
+          "#treeCarousel .carousel-item img"
+        );
         carouselImages.forEach((image) => {
           image.style.cursor = "zoom-in";
           image.addEventListener("click", function () {
@@ -515,6 +514,8 @@ function showPhotoGallery() {
               treePhoto.requestFullscreen();
             } else if (treePhoto.webkitRequestFullscreen) {
               treePhoto.webkitRequestFullscreen();
+            } else if (image.webkitEnterFullscreen) {
+              image.webkitEnterFullscreen();
             }
             treePhoto.style.cursor = "zoom-out";
           } else {
