@@ -166,7 +166,7 @@ function addTreeMarkers() {
   scrollInfoPanelUp();
   if (isMobile()) {
     document.getElementById("basicTutorial").innerHTML =
-      "Scroll up to view the map. Select a tree for more information or use the options menu to:";
+      "Scroll up to view the map. Select a tree for more information or use the menu to:";
   }
 
   // hide the loading screen
@@ -357,6 +357,8 @@ function showTreeInfo(feature) {
                 image.requestFullscreen();
               } else if (image.webkitRequestFullscreen) {
                 image.webkitRequestFullscreen();
+              } else if (image.webkitEnterFullscreen) {
+                image.webkitEnterFullscreen();
               }
               image.style.cursor = "zoom-out";
             } else {
