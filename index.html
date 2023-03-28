@@ -1,100 +1,202 @@
-<!doctype html>
+<!DOCTYPE html>
 <html class="no-js" lang="">
+  <head>
+    <meta charset="utf-8" />
+    <title>Alberta Tree Register Map</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
 
-<head>
-  <meta charset="utf-8">
-  <title>Alberta Tree Register Map</title>
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta property="og:title" content="" />
+    <meta property="og:type" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:image" content="" />
 
-  <meta property="og:title" content="">
-  <meta property="og:type" content="">
-  <meta property="og:url" content="">
-  <meta property="og:image" content="">
+    <link rel="manifest" href="site.webmanifest" />
+    <link
+      rel="apple-touch-icon"
+      href="Alberta-Tree-Registry-favicon-192x192.png"
+    />
+    <link rel="icon" href="/Map/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="/Map/favicon.ico" type="image/x-icon" />
 
-  <link rel="manifest" href="site.webmanifest">
-  <link rel="apple-touch-icon" href="Alberta-Tree-Registry-favicon-192x192.png">
+    <script src="js/ol.js"></script>
+    <link rel="stylesheet" href="css/ol.css" />
 
-  <script src="js/ol.js"></script>
-  <link rel="stylesheet" href="css/ol.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
 
-  <link rel="stylesheet" href="css/bootstrap.min.css">
-  <script src="js/popper.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/main.css" />
 
-  <link rel="stylesheet" href="css/normalize.css">
-  <link rel="stylesheet" href="css/main.css">
+    <meta name="theme-color" content="#198754" />
+  </head>
 
-  <meta name="theme-color" content="#198754">
-</head>
-
-<body>
-  <div id="loading-screen"></div>
-  <div id="map-container">
-    <div id="map"></div>
-    <div id="infoPanel">
-      <div id="infoPanel-header" class="row w-100">
-        <div class="col-8 d-flex justify-content-center">
-          <img src="img/Alberta-Tree-Registry-PNG-long.png" style="margin: auto; max-height:60px; max-width:100%;" />
+  <body>
+    <div id="loading-screen"></div>
+    <div id="map-container">
+      <div id="map"></div>
+      <div id="infoPanel">
+        <div id="infoPanel-header" class="row w-100">
+          <div class="col-8 d-flex justify-content-center">
+            <img
+              src="img/Alberta-Tree-Registry-PNG-long.png"
+              style="margin: auto; max-height: 60px; max-width: 100%"
+            />
+          </div>
+          <div
+            class="btn-group col-4 d-flex justify-content-center align-items-center"
+          >
+            <button
+              id="optionsBtn"
+              class="btn btn-success dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark">
+              <li>
+                <a class="dropdown-item" onclick="showSearch()">Search</a>
+              </li>
+              <li>
+                <a class="dropdown-item" onclick="showTopTrees()">Top Trees</a>
+              </li>
+              <li>
+                <a class="dropdown-item" onclick="showPhotoGallery()"
+                  >Photo Gallery</a
+                >
+              </li>
+              <li>
+                <a
+                  id="nominateBtn"
+                  class="dropdown-item"
+                  onclick="showAddATree()"
+                  >Add a Tree</a
+                >
+              </li>
+              <li>
+                <a class="dropdown-item" onclick="resetMapPosition()"
+                  >Reset Map</a
+                >
+              </li>
+            </ul>
+          </div>
         </div>
-        <div class="btn-group col-4 d-flex justify-content-center align-items-center">
-          <button id="optionsBtn" class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <ul class="dropdown-menu dropdown-menu-dark">
-            <li><a class="dropdown-item" onclick="showSearch()">Search</a></li>
-            <li><a class="dropdown-item" onclick="showTopTrees()">Top Trees</a></li>
-            <li><a class="dropdown-item" onclick="showPhotoGallery()">Photo Gallery</a></li>
-            <li><a id="nominateBtn" class="dropdown-item" onclick="showAddATree()">Add a Tree</a></li>
-            <li><a class="dropdown-item" onclick="resetMapPosition()">Reset Map</a></li>
-          </ul>
-        </div>
-      </div>
-      <div id="treeImages">
-        <div id="treeCarousel" class="carousel slide" data-bs-ride="false" data-bs-touch="true">
-          <!-- Indicators -->
-          <div class="carousel-indicators"></div>
+        <div id="treeImages">
+          <div
+            id="treeCarousel"
+            class="carousel slide"
+            data-bs-ride="false"
+            data-bs-touch="true"
+          >
+            <!-- Indicators -->
+            <div class="carousel-indicators"></div>
 
-          <!-- Wrapper for slides -->
-          <div class="carousel-inner"></div>
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner"></div>
 
-          <!-- Controls -->
-          <button class="carousel-control-prev" type="button" data-bs-target="#treeCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#treeCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </button>
+            <!-- Controls -->
+            <button
+              class="carousel-control-prev"
+              type="button"
+              data-bs-target="#treeCarousel"
+              data-bs-slide="prev"
+            >
+              <span
+                class="carousel-control-prev-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button
+              class="carousel-control-next"
+              type="button"
+              data-bs-target="#treeCarousel"
+              data-bs-slide="next"
+            >
+              <span
+                class="carousel-control-next-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
         </div>
-      </div>
-      <div id="infoPanel-content">
-        <p class="treeName"><strong>Welcome to the Alberta Tree Register Map</strong></p>
-        <p id="basicTutorial">Select a tree on the map for more information or use the menu to:</p>
-        <p>1) Search for a tree by its name, address, or neighbourhood.</p>
-        <p>2) View a list of the top trees. Select a tree to navigate to its location.</p>
-        <p>3) View the photo gallery. Select an image to view it in fullscreen (desktop only) or select the tree name for more information.</p>
-        <p>4) Add a tree to the register.</p>
-        <p>5) Reset the map to its default position.</p>
-        <div id="credits">
-          <p style="text-align: center;"><strong>Credits</strong></p>
-          <p>Map Tiles provided by &copy;<a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors.</p>
-          <p>Mapping Engine provided by <a href="https://openlayers.org" target="_blank">OpenLayers</a></p>
-          <p>Species descriptions provided by <a href="https://chat.openai.com/chat?model=gpt-4" target="_blank">ChatGPT-4</a></p>
-          <p>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik" target="_blank">Freepik</a>
-            from <a href="https://www.flaticon.com/" title="Flaticon" target="_blank">www.flaticon.com</a></p>
+        <div id="infoPanel-content">
+          <p class="treeName">
+            <strong>Welcome to the Alberta Tree Register Map</strong>
+          </p>
+          <p id="basicTutorial">
+            Select a tree on the map for more information or use the menu to:
+          </p>
+          <p>1) Search for a tree by its name, address, or neighbourhood.</p>
+          <p>
+            2) View a list of the top trees. Select a tree to navigate to its
+            location.
+          </p>
+          <p>
+            3) View the photo gallery. Select an image to view it in fullscreen
+            (desktop only) or select the tree name for more information.
+          </p>
+          <p>4) Add a tree to the register.</p>
+          <p>5) Reset the map to its default position.</p>
+          <div id="credits">
+            <p style="text-align: center"><strong>Credits</strong></p>
+            <p>
+              Map Tiles provided by &copy;<a
+                href="https://www.openstreetmap.org/copyright"
+                target="_blank"
+                >OpenStreetMap</a
+              >
+              contributors.
+            </p>
+            <p>
+              Mapping Engine provided by
+              <a href="https://openlayers.org" target="_blank">OpenLayers</a>
+            </p>
+            <p>
+              Species descriptions provided by
+              <a href="https://chat.openai.com/chat?model=gpt-4" target="_blank"
+                >ChatGPT-4</a
+              >
+            </p>
+            <p>
+              Icons made by
+              <a
+                href="https://www.flaticon.com/authors/freepik"
+                title="Freepik"
+                target="_blank"
+                >Freepik</a
+              >
+              from
+              <a
+                href="https://www.flaticon.com/"
+                title="Flaticon"
+                target="_blank"
+                >www.flaticon.com</a
+              >
+            </p>
+          </div>
         </div>
       </div>
     </div>
+    <!-- <div
+      id="tooltip"
+      style="
+        display: none;
+        z-index: 9999;
+        background-color: #fff;
+        padding: 10px;
+        border: 1px solid #ccc;
+        font-size: 1em;
+      "
+    ></div> -->
 
-  </div>
-  <div id="tooltip" style="display: none; z-index: 9999; background-color: #fff; padding: 10px; border: 1px solid #ccc; font-size:1em;"></div>
-
-  <script src="js/vendor/modernizr-3.11.2.min.js"></script>
-  <script src="js/plugins.js"></script>
-  <script src="js/main.js"></script>
-</body>
-
+    <script src="js/vendor/modernizr-3.11.2.min.js"></script>
+    <script src="js/plugins.js"></script>
+    <script src="js/main.js"></script>
+  </body>
 </html>
