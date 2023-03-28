@@ -1,5 +1,5 @@
 function isMobile() {
-  return window.matchMedia("(max-width: 767px)").matches;
+  return window.matchMedia("(max-width: 991px)").matches;
 }
 
 let map = "";

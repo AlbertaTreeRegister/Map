@@ -369,7 +369,7 @@ body {
 }
 
 /* Styles for mobile devices */
-@media (max-width: 767px) {
+@media (max-width: 991px) {
   body {
     overflow-x: hidden;
     overflow-y: auto;
@@ -383,7 +383,7 @@ body {
   }
   #infoPanel {
     position: absolute;
-    max-width: 766px;
+    /* max-width: 766px; */
     top: 91%;
     bottom: 0;
     left: 0;
