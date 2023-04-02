@@ -75,13 +75,11 @@ async function fetchTreeRecords() {
 }
 
 function getTreeStyle(feature) {
-  let src = "img/";
-  src +=
-    feature.get("Category") === "Grove of Trees" ? "forest.png" : "tree.png";
+  const mapIcon = feature.get("Map Icon");
 
   const style = new ol.style.Style({
     image: new ol.style.Icon({
-      src: src,
+      src: mapIcon && mapIcon[0] ? mapIcon[0].url : "img/tree.png",
       anchor: [0.5, 1],
     }),
     text: new ol.style.Text({
@@ -342,7 +340,7 @@ function showTreeInfo(feature) {
         carouselNextBtn.style.display = "";
         carouselPrevBtn.style.display = "";
       }
-      
+
       // Click to Fullscreen images
       if (document.fullscreenEnabled) {
         const carouselImages = document.querySelectorAll(
