@@ -8,6 +8,7 @@ const Trees = {
   records: [],
   top: [],
   withPhotos: [],
+  icons: {},
 };
 
 // fields to show on the info panel when selecting a tree
@@ -75,12 +76,15 @@ async function fetchTreeRecords() {
 }
 
 function getTreeStyle(feature) {
-  const mapIcon = feature.get("Map Icon");
-
-  const style = new ol.style.Style({
+  const mapIcon = feature.get("Map Icon")
+    ? feature.get("Map Icon")[0]
+    : { id: "default", height: 48, width: 42 };
+  let style = null;
+  style = new ol.style.Style({
     image: new ol.style.Icon({
-      src: mapIcon && mapIcon[0] ? mapIcon[0].url : "img/tree.png",
+      img: mapIcon ? Trees.icons[mapIcon.id] : null,
       anchor: [0.5, 1],
+      imgSize: [mapIcon.width, mapIcon.height],
     }),
     text: new ol.style.Text({
       font: "14px Roboto,sans-serif",
@@ -99,6 +103,8 @@ function getTreeStyle(feature) {
 
 function addTreeMarkers() {
   const treeFeatures = [];
+  Trees.icons.default = new Image();
+  Trees.icons.default.src = "img/tree.png";
 
   // Add markers to the map
   Trees.records.forEach(function (record) {
@@ -117,6 +123,12 @@ function addTreeMarkers() {
 
     if ("Photo" in record.fields) {
       Trees.withPhotos.push(record);
+    }
+
+    if ("Map Icon" in record.fields) {
+      const image = new Image();
+      image.src = record.fields["Map Icon"][0].url;
+      Trees.icons[`${record.fields["Map Icon"][0].id}`] = image;
     }
   });
 
