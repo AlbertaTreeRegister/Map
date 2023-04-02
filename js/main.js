@@ -127,7 +127,8 @@ function addTreeMarkers() {
 
     if ("Map Icon" in record.fields) {
       const image = new Image();
-      image.src = record.fields["Map Icon"][0].url;
+      image.crossOrigin = "anonymous";
+      image.src = record.fields["Map Icon"][0].url;      
       Trees.icons[`${record.fields["Map Icon"][0].id}`] = image;
     }
   });
