@@ -90,7 +90,7 @@ function getTreeStyle(feature) {
         width: 3,
       }),
       offsetY: 18,
-      text: map.getView().getZoom() > 14 ? feature.get("Tree Name") : "",
+      text: map.getView().getZoom() > 15 ? feature.get("Tree Name") : "",
     }),
   });
 
