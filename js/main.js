@@ -79,10 +79,10 @@ function getTreeStyle(feature) {
   const mapIcon = feature.get("Map Icon")
     ? feature.get("Map Icon")[0]
     : { id: "default", height: 48, width: 42 };
-  let style = null;
-  style = new ol.style.Style({
+
+  return new ol.style.Style({
     image: new ol.style.Icon({
-      img: mapIcon ? Trees.icons[mapIcon.id] : null,
+      img: Trees.icons[mapIcon.id],
       anchor: [0.5, 1],
       imgSize: [mapIcon.width, mapIcon.height],
     }),
@@ -91,14 +91,12 @@ function getTreeStyle(feature) {
       fill: new ol.style.Fill({ color: "#000" }),
       stroke: new ol.style.Stroke({
         color: "#fff",
-        width: 3,
+        width: 5,
       }),
       offsetY: 18,
-      text: map.getView().getZoom() > 15 ? feature.get("Tree Name") : "",
+      text: map.getView().getZoom() >= 16 ? feature.get("Tree Name") : "",
     }),
   });
-
-  return style;
 }
 
 function addTreeMarkers() {
@@ -128,7 +126,7 @@ function addTreeMarkers() {
     if ("Map Icon" in record.fields) {
       const image = new Image();
       image.crossOrigin = "anonymous";
-      image.src = record.fields["Map Icon"][0].url;      
+      image.src = record.fields["Map Icon"][0].url;
       Trees.icons[`${record.fields["Map Icon"][0].id}`] = image;
     }
   });
