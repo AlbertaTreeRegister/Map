@@ -329,9 +329,6 @@ function showTreeInfo(feature) {
         if (index === 0) {
           indicator.classList.add("active");
           item.classList.add("active");
-          img.addEventListener("load", function () {
-            scrollInfoPanelUp();
-          });
         }
 
         // add image to item and item to inner carousel
@@ -377,8 +374,6 @@ function showTreeInfo(feature) {
         });
       }
       const carousel = new bootstrap.Carousel("#treeCarousel");
-    } else {
-      scrollInfoPanelUp();
     }
   }
 }
@@ -652,6 +647,8 @@ function showSearch() {
   searchResultsContainer.classList.add("search-results-container");
   infoPanel.appendChild(searchResultsContainer);
 
+  searchInput.focus();
+
   function displaySearchResults(results) {
     searchResultsContainer.innerHTML = "";
     // Create the table element and add it to the container
@@ -724,11 +721,16 @@ function searchTrees(query) {
       tree.fields["Neighbourhood Text"] && tree.fields["Neighbourhood Text"][0]
         ? tree.fields["Neighbourhood Text"][0].toLowerCase()
         : "";
+    const species =
+      tree.fields["Genus species Text"] && tree.fields["Genus species Text"][0]
+        ? tree.fields["Genus species Text"][0].toLowerCase()
+        : "";
 
     return (
       (name && name.includes(query)) ||
       (address && address.includes(query)) ||
-      (neighbourhood && neighbourhood.includes(query))
+      (neighbourhood && neighbourhood.includes(query)) ||
+      (species && species.includes(query))
     );
   });
 }
