@@ -85,6 +85,7 @@ function getTreeStyle(feature) {
       img: Trees.icons[mapIcon.id],
       anchor: [0.5, 1],
       imgSize: [mapIcon.width, mapIcon.height],
+      scale: 0.65
     }),
     text: new ol.style.Text({
       font: "14px Roboto,sans-serif",
@@ -98,6 +99,39 @@ function getTreeStyle(feature) {
     }),
   });
 }
+
+function selectStyle(feature) {
+  const mapIcon = feature.get("Map Icon")
+    ? feature.get("Map Icon")[0]
+    : { id: "default", height: 48, width: 42 };
+
+    const selectstyle = new ol.style.Style({
+    image: new ol.style.Icon({
+      img: Trees.icons[mapIcon.id],
+      anchor: [0.5, 1],
+      imgSize: [mapIcon.width, mapIcon.height],
+      scale: 1.0
+    }),
+    text: new ol.style.Text({
+      font: "14px Roboto,sans-serif",
+      fill: new ol.style.Fill({ color: "#000" }),
+      stroke: new ol.style.Stroke({
+        color: "#add8e6",
+        width: 5,
+      }),
+      offsetY: 18,
+      text: map.getView().getZoom() >= 16 ? feature.get("Tree Name") : "",
+    }),
+    zIndex: 9999
+  });
+  return selectstyle;
+}
+
+// select interaction working on "click"
+const selectClick = new ol.interaction.Select({
+  condition: ol.interaction.click,
+  style: selectStyle,
+});
 
 function addTreeMarkers() {
   const treeFeatures = [];
@@ -202,6 +236,13 @@ function resetMapPosition() {
 }
 
 function setupMapEvents() {
+  map.addInteraction(selectClick);
+  selectClick.on('select', function (e) {
+    const treeFeature = e.target.getFeatures().item(0);
+    if (treeFeature) {
+        zoomToTree(treeFeature.getId());
+      }
+  });
   map.on("click", function (event) {
     if (NewTree.selectingLocation) {
       const coordinate = event.coordinate;
@@ -209,16 +250,6 @@ function setupMapEvents() {
       NewTree.longitude = ol.proj.toLonLat(coordinate)[0].toFixed(5);
       setSelectedLocation();
       disableSelectingLocation();
-    } else {
-      const treeFeature = map.forEachFeatureAtPixel(
-        event.pixel,
-        function (feature) {
-          return feature;
-        }
-      );
-      if (treeFeature) {
-        zoomToTree(treeFeature.getId());
-      }
     }
   });
 }
@@ -430,7 +461,7 @@ function showTopTrees() {
 
     // Add a click event listener to each table row
     rowElement.addEventListener("click", function (event) {
-      zoomToTree(tree.id);
+      selectTree(tree.id);
     });
   });
   // Update Info Panel with Top Trees
@@ -449,12 +480,21 @@ function resetCarousel() {
   carouselInner.innerHTML = "";
 }
 
+function selectTree(treeId) {
+  // Clear the current selection
+  selectClick.getFeatures().clear();
+  const feature = Trees.layer.getSource().getFeatureById(treeId);
+  // Add the feature to the selection
+  selectClick.getFeatures().push(feature);
+  zoomToTree(treeId);
+}
+
 function zoomToTree(treeId) {
   // Zoom the map to the corresponding feature and display its information
   const feature = Trees.layer.getSource().getFeatureById(treeId);
   const treeExtent = feature.getGeometry().getExtent();
   map.getView().fit(treeExtent, {
-    duration: 1000,
+    duration: 600,
     minResolution:
       map.getView().getZoom() < 16
         ? map.getView().getResolutionForZoom(16)
@@ -538,7 +578,7 @@ function showPhotoGallery() {
 
       // Zoom to tree when clicking on the Tree Name
       treeName.addEventListener("click", function (event) {
-        zoomToTree(tree.id);
+        selectTree(tree.id);
       });
       paginatedContent.appendChild(treePhoto);
       paginatedContent.appendChild(treeName);
@@ -698,7 +738,7 @@ function showSearch() {
 
       // Add a click event listener to each table row
       rowElement.addEventListener("click", function (event) {
-        zoomToTree(tree.id);
+        selectTree(tree.id);
       });
     });
     searchResultsContainer.appendChild(tableElement);
