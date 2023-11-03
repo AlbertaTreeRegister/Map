@@ -127,7 +127,7 @@ function selectStyle(feature) {
   return selectstyle;
 }
 
-// select interaction working on "click"
+// select interaction - handled manually so that it plays nice with adding a tree
 const selectClick = new ol.interaction.Select({
   condition: ol.events.condition.never,
   style: selectStyle,
@@ -254,6 +254,7 @@ function setupMapEvents() {
         }
       );
       if (treeFeature) {
+        clearSelectedLocation();
         selectClick.getFeatures().push(treeFeature);
         zoomToTree(treeFeature.getId());
       }
