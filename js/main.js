@@ -129,7 +129,7 @@ function selectStyle(feature) {
 
 // select interaction working on "click"
 const selectClick = new ol.interaction.Select({
-  condition: ol.interaction.click,
+  condition: ol.events.condition.never,
   style: selectStyle,
 });
 
@@ -237,19 +237,26 @@ function resetMapPosition() {
 
 function setupMapEvents() {
   map.addInteraction(selectClick);
-  selectClick.on('select', function (e) {
-    const treeFeature = e.target.getFeatures().item(0);
-    if (treeFeature) {
-        zoomToTree(treeFeature.getId());
-      }
-  });
   map.on("click", function (event) {
+    selectClick.getFeatures().clear();
     if (NewTree.selectingLocation) {
       const coordinate = event.coordinate;
       NewTree.latitude = ol.proj.toLonLat(coordinate)[1].toFixed(5);
       NewTree.longitude = ol.proj.toLonLat(coordinate)[0].toFixed(5);
       setSelectedLocation();
       disableSelectingLocation();
+    }
+    else {      
+      const treeFeature = map.forEachFeatureAtPixel(
+        event.pixel,
+        function (feature) {
+          return feature;
+        }
+      );
+      if (treeFeature) {
+        selectClick.getFeatures().push(treeFeature);
+        zoomToTree(treeFeature.getId());
+      }
     }
   });
 }
@@ -494,7 +501,7 @@ function zoomToTree(treeId) {
   const feature = Trees.layer.getSource().getFeatureById(treeId);
   const treeExtent = feature.getGeometry().getExtent();
   map.getView().fit(treeExtent, {
-    duration: 600,
+    duration: 500,
     minResolution:
       map.getView().getZoom() < 16
         ? map.getView().getResolutionForZoom(16)
@@ -913,7 +920,7 @@ function setSelectedLocation() {
   map.getView().animate({
     center: center,
     zoom: 19,
-    duration: 1000,
+    duration: 500,
   });
   const addTreeButton = document.getElementById("addTreeButton");
   addTreeButton.disabled = false;
