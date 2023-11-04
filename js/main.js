@@ -88,7 +88,7 @@ function getTreeStyle(feature) {
       scale: 0.65
     }),
     text: new ol.style.Text({
-      font: "12px Roboto,sans-serif",
+      font: "12px Segoe UI,sans-serif",
       fill: new ol.style.Fill({ color: "#000" }),
       stroke: new ol.style.Stroke({
         color: "#fff",
@@ -113,7 +113,7 @@ function selectStyle(feature) {
       scale: 1.0
     }),
     text: new ol.style.Text({
-      font: "14px Roboto,sans-serif",
+      font: "14px Segoe UI,sans-serif",
       fill: new ol.style.Fill({ color: "#000" }),
       stroke: new ol.style.Stroke({
         color: "#add8e6",
