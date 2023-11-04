@@ -88,11 +88,11 @@ function getTreeStyle(feature) {
       scale: 0.65
     }),
     text: new ol.style.Text({
-      font: "14px Roboto,sans-serif",
+      font: "12px Roboto,sans-serif",
       fill: new ol.style.Fill({ color: "#000" }),
       stroke: new ol.style.Stroke({
         color: "#fff",
-        width: 5,
+        width: 3,
       }),
       offsetY: 18,
       text: map.getView().getZoom() >= 16 ? feature.get("Tree Name") : "",
@@ -117,7 +117,7 @@ function selectStyle(feature) {
       fill: new ol.style.Fill({ color: "#000" }),
       stroke: new ol.style.Stroke({
         color: "#add8e6",
-        width: 5,
+        width: 4,
       }),
       offsetY: 18,
       text: map.getView().getZoom() >= 16 ? feature.get("Tree Name") : "",
