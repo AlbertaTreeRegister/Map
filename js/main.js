@@ -110,14 +110,14 @@ function selectStyle(feature) {
       img: Trees.icons[mapIcon.id],
       anchor: [0.5, 1],
       imgSize: [mapIcon.width, mapIcon.height],
-      scale: 1.0
+      scale: 0.85
     }),
     text: new ol.style.Text({
       font: "14px Segoe UI,sans-serif",
       fill: new ol.style.Fill({ color: "#000" }),
       stroke: new ol.style.Stroke({
         color: "#add8e6",
-        width: 4,
+        width: 3,
       }),
       offsetY: 18,
       text: map.getView().getZoom() >= 16 ? feature.get("Tree Name") : "",
@@ -142,7 +142,8 @@ function addTreeMarkers() {
   Trees.records.forEach(function (record) {
     const treeFeature = new ol.Feature({
       geometry: new ol.geom.Point(
-        ol.proj.fromLonLat([record.fields.Longitude, record.fields.Latitude])
+        ol.proj.fromLonLat([record.fields["Tree Longitude"], record.fields["Tree Latitude"]
+      ])
       ),
     });
     treeFeature.setId(record.id);
@@ -257,15 +258,17 @@ function setupMapEvents() {
         clearSelectedLocation();
         selectClick.getFeatures().push(treeFeature);
         zoomToTree(treeFeature.getId());
+        scrollInfoPanelUp();
       }
     }
   });
 }
 
 function scrollInfoPanelUp() {
+  const infoPanelDiv = document.getElementById("infoPanel");
   if (isMobile()) {
-    const myDiv = document.getElementById("infoPanel");
-    const rect = myDiv.getBoundingClientRect();
+    // on mobile, move the div up or down so that the top edge aligns with the top edge of the screen
+    const rect = infoPanelDiv.getBoundingClientRect();
     const offset = window.scrollY;
     const top = rect.top + offset;
 
@@ -273,6 +276,10 @@ function scrollInfoPanelUp() {
       top: top,
       behavior: "smooth",
     });
+  }
+  else {
+    // on desktop, scroll to the top of the info panel
+    infoPanelDiv.scrollTop = 0;
   }
 }
 
@@ -495,6 +502,7 @@ function selectTree(treeId) {
   // Add the feature to the selection
   selectClick.getFeatures().push(feature);
   zoomToTree(treeId);
+  scrollInfoPanelUp();
 }
 
 function zoomToTree(treeId) {
