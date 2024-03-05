@@ -440,7 +440,6 @@ tr {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-wrap: wrap;
   margin: 0 auto;
   max-width: 400px;
 }
