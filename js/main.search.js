@@ -139,7 +139,7 @@ function showSearch() {
     tableElement.appendChild(tableBodyElement);
 
     // if no results are found, display a message
-    if (results.neighbourhoods.length === 0 && results.trees.length === 0) {
+    if (results.municipalities.length === 0 && results.neighbourhoods.length === 0 && results.trees.length === 0) {
       searchResultsContainer.innerHTML = `<p style="margin: revert;">No Results Found.</p>`;
       scrollInfoPanelUp();
       return;
