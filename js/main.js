@@ -85,7 +85,7 @@ function getTreeStyle(feature) {
       img: Trees.icons[mapIcon.id],
       anchor: [0.5, 1],
       imgSize: [mapIcon.width, mapIcon.height],
-      scale: 0.65
+      scale: 0.65,
     }),
     text: new ol.style.Text({
       font: "12px Segoe UI,sans-serif",
@@ -105,12 +105,12 @@ function selectStyle(feature) {
     ? feature.get("Map Icon")[0]
     : { id: "default", height: 48, width: 42 };
 
-    const selectstyle = new ol.style.Style({
+  const selectstyle = new ol.style.Style({
     image: new ol.style.Icon({
       img: Trees.icons[mapIcon.id],
       anchor: [0.5, 1],
       imgSize: [mapIcon.width, mapIcon.height],
-      scale: 0.85
+      scale: 0.85,
     }),
     text: new ol.style.Text({
       font: "14px Segoe UI,sans-serif",
@@ -122,7 +122,7 @@ function selectStyle(feature) {
       offsetY: 18,
       text: map.getView().getZoom() >= 16 ? feature.get("Tree Name") : "",
     }),
-    zIndex: 9999
+    zIndex: 9999,
   });
   return selectstyle;
 }
@@ -142,8 +142,10 @@ function addTreeMarkers() {
   Trees.records.forEach(function (record) {
     const treeFeature = new ol.Feature({
       geometry: new ol.geom.Point(
-        ol.proj.fromLonLat([record.fields["Tree Longitude"], record.fields["Tree Latitude"]
-      ])
+        ol.proj.fromLonLat([
+          record.fields["Tree Longitude"],
+          record.fields["Tree Latitude"],
+        ])
       ),
     });
     treeFeature.setId(record.id);
@@ -167,9 +169,7 @@ function addTreeMarkers() {
   });
 
   const baseTileLayer = new ol.layer.Tile({
-    source: new ol.source.OSM({
-      attributions: [],
-    }),
+    source: new ol.source.OSM(),
   });
 
   Trees.layer = new ol.layer.Vector({
@@ -202,7 +202,6 @@ function addTreeMarkers() {
       maxZoom: 19,
       minZoom: 5,
     }),
-    controls: [],
   });
 
   resetMapPosition();
@@ -246,8 +245,7 @@ function setupMapEvents() {
       NewTree.longitude = ol.proj.toLonLat(coordinate)[0].toFixed(5);
       setSelectedLocation();
       disableSelectingLocation();
-    }
-    else {      
+    } else {
       const treeFeature = map.forEachFeatureAtPixel(
         event.pixel,
         function (feature) {
@@ -276,8 +274,7 @@ function scrollInfoPanelUp() {
       top: top,
       behavior: "smooth",
     });
-  }
-  else {
+  } else {
     // on desktop, scroll to the top of the info panel
     infoPanelDiv.scrollTop = 0;
   }
@@ -534,8 +531,10 @@ function zoomToNeighbourhood(neighbourhood) {
 // zoom to the Location of the municipality
 function zoomToMunicipality(municipality) {
   map.getView().animate({
-    center: ol.proj.fromLonLat([municipality.fields["Longitude"],
-    municipality.fields["Latitude"],]),
+    center: ol.proj.fromLonLat([
+      municipality.fields["Longitude"],
+      municipality.fields["Latitude"],
+    ]),
     zoom: 13,
     duration: 500,
   });
