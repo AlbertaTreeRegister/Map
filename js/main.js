@@ -11,6 +11,25 @@ const Trees = {
   icons: {},
 };
 
+// fields to include when querying Tree data from Airtable
+const queryFields = [
+  "Map Icon",
+  "Tree Name",
+  "Description",
+  "Genus species Text",
+  "Species Description",
+  "Tree Latitude",
+  "Tree Longitude",
+  "Photo",
+  "Address",
+  "Age",
+  "Condition",
+  "Height (m)",
+  "Circumference (m)",
+  "Canopy Spread (m)",
+  "DBH (m)",
+];
+
 // fields to show on the info panel when selecting a tree
 const displayFields = [
   "Address",
@@ -46,7 +65,13 @@ async function fetchTreeRecords() {
   const baseId = "appQryFCb5Fi3nZ4c";
   const tableName = "tbljBWCUMUSwrF2co";
   const mapViewId = "viw8Jbt3m4xWa1f1h";
-  const airtableUrl = `https://api.airtable.com/v0/${baseId}/${tableName}?view=${mapViewId}`;
+  let airtableUrl = `https://api.airtable.com/v0/${baseId}/${tableName}?view=${mapViewId}`;
+
+  // limit results to fields included in the queryFields array
+  queryFields.forEach((field) => {
+    airtableUrl += `&fields[]=${field}`;
+  });
+
   const airTablePersonalAccessToken =
     "patS6srnbXVthid6g.8b1b2fe74ad1685642ceadbb93e63b8223ee21d14a569f9debe2e948a563170a";
   let offset = "";
@@ -102,7 +127,7 @@ function getTreeStyle(feature) {
 function selectStyle(feature) {
   const mapIcon = feature.get("Map Icon")
     ? feature.get("Map Icon")[0]
-    : { id: "default", height: 48, width: 42 };
+    : { id: "default" };
 
   const selectstyle = new ol.style.Style({
     image: new ol.style.Icon({
@@ -147,7 +172,12 @@ async function addTreeMarkers() {
 
   const imageLoadedPromises = Trees.records.map(async (record) => {
     const { fields, id } = record;
-    const { "Tree Longitude": lon, "Tree Latitude": lat, Photo, "Map Icon": mapIcon } = fields;
+    const {
+      "Tree Longitude": lon,
+      "Tree Latitude": lat,
+      Photo,
+      "Map Icon": mapIcon,
+    } = fields;
 
     const treeFeature = new ol.Feature({
       geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat])),
@@ -164,7 +194,7 @@ async function addTreeMarkers() {
       Trees.withPhotos.push(record);
     }
 
-    if (mapIcon) {
+    if (mapIcon && !Trees.icons[mapIcon[0].id]) {
       Trees.icons[mapIcon[0].id] = await loadImage(mapIcon[0].url);
     }
   });
@@ -182,7 +212,7 @@ async function addTreeMarkers() {
     }),
     style: getTreeStyle,
     // Openlayers 9.0.0 bug fix to add this class - unused otherwise
-    className:"treeVectors",
+    className: "treeVectors",
   });
 
   NewTree.layer = new ol.layer.Vector({
@@ -197,7 +227,7 @@ async function addTreeMarkers() {
       }),
     }),
     // Openlayers 9.0.0 bug fix to add this class - unused otherwise
-    className:"newTreeVectors",
+    className: "newTreeVectors",
   });
 
   // Set up the map
@@ -249,7 +279,9 @@ function setupMapEvents() {
     selectClick.getFeatures().clear();
     if (NewTree.selectingLocation) {
       const coordinate = event.coordinate;
-      const [longitude, latitude] = ol.proj.toLonLat(coordinate).map(coord => coord.toFixed(5));
+      const [longitude, latitude] = ol.proj
+        .toLonLat(coordinate)
+        .map((coord) => coord.toFixed(5));
       NewTree.latitude = latitude;
       NewTree.longitude = longitude;
       setSelectedLocation();
@@ -497,7 +529,7 @@ function toggleCarouselControls(show) {
   const carouselNextBtn = document.querySelector(".carousel-control-next");
   const carouselPrevBtn = document.querySelector(".carousel-control-prev");
   const displayStyle = show ? "" : "none";
-  
+
   carouselNextBtn.style.display = displayStyle;
   carouselPrevBtn.style.display = displayStyle;
   carouselIndicators.style.display = displayStyle;
@@ -782,7 +814,9 @@ function showAddATree() {
 
 function addTreeAtLocation() {
   if (NewTree.locationSelected()) {
-    const airtableFormUrl = `https://airtable.com/shrT9KRuUUqyMQJ89?prefill_Tree Latitude=${encodeURIComponent(NewTree.latitude)}&prefill_Tree Longitude=${encodeURIComponent(NewTree.longitude)}`;
+    const airtableFormUrl = `https://airtable.com/shrT9KRuUUqyMQJ89?prefill_Tree Latitude=${encodeURIComponent(
+      NewTree.latitude
+    )}&prefill_Tree Longitude=${encodeURIComponent(NewTree.longitude)}`;
     // opens a new window with the airtable form for nominating a tree
     window.open(airtableFormUrl, "_blank");
   }
