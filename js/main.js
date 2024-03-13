@@ -133,66 +133,39 @@ const selectClick = new ol.interaction.Select({
 
 async function addTreeMarkers() {
   const treeFeatures = [];
-  Trees.icons.default = new Image();
-  Trees.icons.default.src = "img/tree.png";
 
-  let imageLoadedPromises = [];
-
-  // Add markers to the map
-  Trees.records.forEach(function (record) {
-    const treeFeature = new ol.Feature({
-      geometry: new ol.geom.Point(
-        ol.proj.fromLonLat([
-          record.fields["Tree Longitude"],
-          record.fields["Tree Latitude"],
-        ])
-      ),
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
     });
-    treeFeature.setId(record.id);
+  }
 
-    for (let propertyName in record.fields) {
-      treeFeature.set(propertyName, record.fields[propertyName]);
-    }
+  Trees.icons.default = await loadImage("img/tree.png");
+
+  const imageLoadedPromises = Trees.records.map(async (record) => {
+    const { fields, id } = record;
+    const { "Tree Longitude": lon, "Tree Latitude": lat, Photo, "Map Icon": mapIcon } = fields;
+
+    const treeFeature = new ol.Feature({
+      geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat])),
+    });
+    treeFeature.setId(id);
+
+    Object.entries(fields).forEach(([key, value]) => {
+      treeFeature.set(key, value);
+    });
 
     treeFeatures.push(treeFeature);
 
-    if ("Photo" in record.fields) {
+    if (Photo) {
       Trees.withPhotos.push(record);
     }
 
-    if ("Map Icon" in record.fields) {
-      // create an image object and then draw it onto a canvas
-      // this is necessary to use the image as an icon in openlayers
-
-      // Create a new image object
-      let img = new Image();
-
-      // Create a promise that resolves when the image is loaded
-      let imgPromise = new Promise((resolve, reject) => {
-        img.onload = function() {
-          let canvas = document.createElement('canvas');
-          let context = canvas.getContext('2d');
-
-          // Set the canvas dimensions to the image dimensions
-          canvas.width = img.width;
-          canvas.height = img.height;
-
-          // Draw the image onto the canvas
-          context.drawImage(img, 0, 0, img.width, img.height);
-
-          // Now you can use the canvas as needed...
-          Trees.icons[`${record.fields["Map Icon"][0].id}`] = canvas;
-          resolve();
-        };
-
-        img.onerror = reject;
-      });
-
-      // Add the promise to the array
-      imageLoadedPromises.push(imgPromise);
-
-      // Set the image source to start loading the image
-      img.src = record.fields["Map Icon"][0].url;
+    if (mapIcon) {
+      Trees.icons[mapIcon[0].id] = await loadImage(mapIcon[0].url);
     }
   });
 
@@ -209,7 +182,7 @@ async function addTreeMarkers() {
     }),
     style: getTreeStyle,
     // Openlayers 9.0.0 bug fix to add this class - unused otherwise
-    className:"gojiVectors",
+    className:"treeVectors",
   });
 
   NewTree.layer = new ol.layer.Vector({
@@ -223,6 +196,8 @@ async function addTreeMarkers() {
         width: 2,
       }),
     }),
+    // Openlayers 9.0.0 bug fix to add this class - unused otherwise
+    className:"newTreeVectors",
   });
 
   // Set up the map
@@ -274,8 +249,9 @@ function setupMapEvents() {
     selectClick.getFeatures().clear();
     if (NewTree.selectingLocation) {
       const coordinate = event.coordinate;
-      NewTree.latitude = ol.proj.toLonLat(coordinate)[1].toFixed(5);
-      NewTree.longitude = ol.proj.toLonLat(coordinate)[0].toFixed(5);
+      const [longitude, latitude] = ol.proj.toLonLat(coordinate).map(coord => coord.toFixed(5));
+      NewTree.latitude = latitude;
+      NewTree.longitude = longitude;
       setSelectedLocation();
       disableSelectingLocation();
     } else {
@@ -413,17 +389,8 @@ function showTreeInfo(feature) {
         carouselInner.appendChild(item);
       });
 
-      const carouselNextBtn = document.querySelector(".carousel-control-next");
-      const carouselPrevBtn = document.querySelector(".carousel-control-prev");
-      if (photos.length === 1) {
-        carouselIndicators.style.display = "none";
-        carouselNextBtn.style.display = "none";
-        carouselPrevBtn.style.display = "none";
-      } else {
-        carouselIndicators.style.display = "";
-        carouselNextBtn.style.display = "";
-        carouselPrevBtn.style.display = "";
-      }
+      // show carousel controls if there are multiple images
+      toggleCarouselControls(photos.length > 1);
 
       // Click to Fullscreen images
       if (document.fullscreenEnabled) {
@@ -523,6 +490,17 @@ function resetCarousel() {
   carouselIndicators.innerHTML = "";
   const carouselInner = document.querySelector(".carousel-inner");
   carouselInner.innerHTML = "";
+}
+
+function toggleCarouselControls(show) {
+  const carouselIndicators = document.querySelector(".carousel-indicators");
+  const carouselNextBtn = document.querySelector(".carousel-control-next");
+  const carouselPrevBtn = document.querySelector(".carousel-control-prev");
+  const displayStyle = show ? "" : "none";
+  
+  carouselNextBtn.style.display = displayStyle;
+  carouselPrevBtn.style.display = displayStyle;
+  carouselIndicators.style.display = displayStyle;
 }
 
 function selectTree(treeId) {
@@ -804,7 +782,7 @@ function showAddATree() {
 
 function addTreeAtLocation() {
   if (NewTree.locationSelected()) {
-    const airtableFormUrl = `https://airtable.com/shrT9KRuUUqyMQJ89?prefill_Latitude=${NewTree.latitude}&prefill_Longitude=${NewTree.longitude}`;
+    const airtableFormUrl = `https://airtable.com/shrT9KRuUUqyMQJ89?prefill_Tree Latitude=${encodeURIComponent(NewTree.latitude)}&prefill_Tree Longitude=${encodeURIComponent(NewTree.longitude)}`;
     // opens a new window with the airtable form for nominating a tree
     window.open(airtableFormUrl, "_blank");
   }
@@ -832,12 +810,9 @@ function disableSelectingLocation() {
 function setSelectedLocation() {
   clearSelectedLocation();
   const selectedLocationDiv = document.getElementById("selectedLocation");
-  selectedLocationDiv.innerHTML =
-    "<p>Selected Location:</p><p>Latitude: " +
-    NewTree.latitude +
-    "<br>Longitude: " +
-    NewTree.longitude +
-    "</p>";
+  selectedLocationDiv.innerHTML = `
+    <p>Selected Location:</p>
+    <p>Latitude: ${NewTree.latitude}<br>Longitude: ${NewTree.longitude}</p>`;
   const center = ol.proj.fromLonLat([NewTree.longitude, NewTree.latitude]);
   const circleGeometry = new ol.geom.Circle(center, 3);
   const circleFeature = new ol.Feature(circleGeometry);
@@ -856,9 +831,6 @@ function clearSelectedLocation() {
 }
 
 // hide carousel controls by default
-const carouselNextBtn = document.querySelector(".carousel-control-next");
-const carouselPrevBtn = document.querySelector(".carousel-control-prev");
-carouselNextBtn.style.display = "none";
-carouselPrevBtn.style.display = "none";
+toggleCarouselControls(false);
 
 fetchTreeRecords();
