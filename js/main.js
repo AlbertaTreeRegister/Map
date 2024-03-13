@@ -78,13 +78,12 @@ async function fetchTreeRecords() {
 function getTreeStyle(feature) {
   const mapIcon = feature.get("Map Icon")
     ? feature.get("Map Icon")[0]
-    : { id: "default", height: 48, width: 42 };
+    : { id: "default" };
 
   return new ol.style.Style({
     image: new ol.style.Icon({
       img: Trees.icons[mapIcon.id],
       anchor: [0.5, 1],
-      imgSize: [mapIcon.width, mapIcon.height],
       scale: 0.65,
     }),
     text: new ol.style.Text({
@@ -109,7 +108,6 @@ function selectStyle(feature) {
     image: new ol.style.Icon({
       img: Trees.icons[mapIcon.id],
       anchor: [0.5, 1],
-      imgSize: [mapIcon.width, mapIcon.height],
       scale: 0.85,
     }),
     text: new ol.style.Text({
@@ -133,10 +131,12 @@ const selectClick = new ol.interaction.Select({
   style: selectStyle,
 });
 
-function addTreeMarkers() {
+async function addTreeMarkers() {
   const treeFeatures = [];
   Trees.icons.default = new Image();
   Trees.icons.default.src = "img/tree.png";
+
+  let imageLoadedPromises = [];
 
   // Add markers to the map
   Trees.records.forEach(function (record) {
@@ -161,12 +161,43 @@ function addTreeMarkers() {
     }
 
     if ("Map Icon" in record.fields) {
-      const image = new Image();
-      image.crossOrigin = "anonymous";
-      image.src = record.fields["Map Icon"][0].url;
-      Trees.icons[`${record.fields["Map Icon"][0].id}`] = image;
+      // create an image object and then draw it onto a canvas
+      // this is necessary to use the image as an icon in openlayers
+
+      // Create a new image object
+      let img = new Image();
+
+      // Create a promise that resolves when the image is loaded
+      let imgPromise = new Promise((resolve, reject) => {
+        img.onload = function() {
+          let canvas = document.createElement('canvas');
+          let context = canvas.getContext('2d');
+
+          // Set the canvas dimensions to the image dimensions
+          canvas.width = img.width;
+          canvas.height = img.height;
+
+          // Draw the image onto the canvas
+          context.drawImage(img, 0, 0, img.width, img.height);
+
+          // Now you can use the canvas as needed...
+          Trees.icons[`${record.fields["Map Icon"][0].id}`] = canvas;
+          resolve();
+        };
+
+        img.onerror = reject;
+      });
+
+      // Add the promise to the array
+      imageLoadedPromises.push(imgPromise);
+
+      // Set the image source to start loading the image
+      img.src = record.fields["Map Icon"][0].url;
     }
   });
+
+  // Wait for all images to load before initializing the map
+  await Promise.all(imageLoadedPromises);
 
   const baseTileLayer = new ol.layer.Tile({
     source: new ol.source.OSM(),
@@ -177,6 +208,8 @@ function addTreeMarkers() {
       features: treeFeatures,
     }),
     style: getTreeStyle,
+    // Openlayers 9.0.0 bug fix to add this class - unused otherwise
+    className:"gojiVectors",
   });
 
   NewTree.layer = new ol.layer.Vector({
