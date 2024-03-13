@@ -11,37 +11,6 @@ const Trees = {
   icons: {},
 };
 
-// fields to include when querying Tree data from Airtable
-const queryFields = [
-  "Map Icon",
-  "Tree Name",
-  "Description",
-  "Genus species Text",
-  "Species Description",
-  "Tree Latitude",
-  "Tree Longitude",
-  "Photo",
-  "Address",
-  "Age",
-  "Condition",
-  "Height (m)",
-  "Circumference (m)",
-  "Canopy Spread (m)",
-  "DBH (m)",
-  "Species Score",
-];
-
-// fields to show on the info panel when selecting a tree
-const displayFields = [
-  "Address",
-  "Age",
-  "Condition",
-  "Height (m)",
-  "Circumference (m)",
-  "Canopy Spread (m)",
-  "DBH (m)",
-];
-
 // data and objects related to the Add a Tree functionality
 const NewTree = {
   latitude: null,
@@ -67,6 +36,26 @@ async function fetchTreeRecords() {
   const tableName = "tbljBWCUMUSwrF2co";
   const mapViewId = "viw8Jbt3m4xWa1f1h";
   let airtableUrl = `https://api.airtable.com/v0/${baseId}/${tableName}?view=${mapViewId}`;
+
+  // fields to include when querying Tree data from Airtable
+  const queryFields = [
+    "Map Icon",
+    "Tree Name",
+    "Description",
+    "Genus species Text",
+    "Species Description",
+    "Tree Latitude",
+    "Tree Longitude",
+    "Photo",
+    "Address",
+    "Age",
+    "Condition",
+    "Height (m)",
+    "Circumference (m)",
+    "Canopy Spread (m)",
+    "DBH (m)",
+    "Species Score",
+  ];
 
   // limit results to fields included in the queryFields array
   queryFields.forEach((field) => {
@@ -322,135 +311,160 @@ function scrollInfoPanelUp() {
   }
 }
 
+function formatMeasurementFieldValue(field, value) {
+  if (field.slice(-3) === "(m)") {
+    // convert meters to feet
+    const measureFeet = (value * 3.28084).toFixed(2);
+    return `${value.toFixed(2)}m (${measureFeet} ft)`;
+  } else {
+    return value;
+  }
+}
+
+function createHTMLParagraph(field, value) {
+  return `<p><strong>${field}:</strong> ${value}</p>`;
+}
+
+function createTreeInfoHTML(feature) {
+  const html = [];
+  const name = feature.get("Tree Name");
+  html.push(`<p class="treeName"><strong>${name}</strong></p>`);
+  const description = feature.get("Description");
+  if (description) {
+    html.push(`<p>${description}</p>`);
+  }
+
+  const displayFields = [
+    "Address",
+    "Age",
+    "Condition",
+    "Height (m)",
+    "Circumference (m)",
+    "Canopy Spread (m)",
+    "DBH (m)",
+  ];
+
+  displayFields.forEach(function (field) {
+    const fieldValue = feature.get(field);
+    if (fieldValue) {
+      const formattedValue = formatMeasurementFieldValue(field, fieldValue);
+      html.push(createHTMLParagraph(field, formattedValue));
+    }
+  });
+
+  const treeGenus = feature.get("Genus species Text");
+  if (treeGenus) {
+    html.push(createHTMLParagraph("Species", treeGenus));
+
+    const speciesDescription = feature.get("Species Description");
+    if (speciesDescription) {
+      html.push(`<p>${speciesDescription}</p>`);
+    }
+  }
+  return html.join("");
+}
+
+function createGoogleMapsButton(feature) {
+  const googleMapsButton = document.createElement("button");
+  googleMapsButton.style.border = "none";
+  googleMapsButton.style.background = "none";
+  googleMapsButton.title = "Open in Google Maps";
+  const googleMapsIcon =
+    '<img id="googleMapsIcon" src="img/google-maps-old.svg" style="width: 48px; height: 48px">';
+  googleMapsButton.innerHTML = googleMapsIcon;
+  googleMapsButton.addEventListener("click", function () {
+    const latitude = feature.get("Tree Latitude");
+    const longitude = feature.get("Tree Longitude");
+    let url =
+      "https://www.google.com/maps/search/?api=1&query=" +
+      latitude +
+      "%2C" +
+      longitude;
+    window.open(url);
+  });
+
+  return googleMapsButton;
+}
+
+function createCarouselIndicator(index) {
+  const indicator = document.createElement("button");
+  indicator.setAttribute("data-bs-target", "#treeCarousel");
+  indicator.setAttribute("data-bs-slide-to", index);
+  indicator.setAttribute("aria-label", "Slide " + (index + 1));
+  if (index === 0) {
+    indicator.classList.add("active");
+  }
+  return indicator;
+}
+
+function createCarouselItem(image, index) {
+  const item = document.createElement("div");
+  item.classList.add("carousel-item");
+  const img = document.createElement("img");
+  img.classList.add("d-block", "w-100");
+  img.src = image.url;
+  if (index === 0) {
+    item.classList.add("active");
+  }
+  item.appendChild(img);
+  return item;
+}
+
+function setupImageCarousel(feature) {
+  // reset carousel
+  resetCarousel();
+
+  const photos = feature.get("Photo");
+  if (photos) {
+    const carouselIndicators = document.querySelector(".carousel-indicators");
+    const carouselInner = document.querySelector(".carousel-inner");
+
+    photos.forEach((image, index) => {
+      const indicator = createCarouselIndicator(index);
+      const item = createCarouselItem(image, index);
+
+      carouselIndicators.appendChild(indicator);
+      carouselInner.appendChild(item);
+    });
+
+    // show carousel controls if there are multiple images
+    toggleCarouselControls(photos.length > 1);
+
+    // Click to Fullscreen images
+    if (document.fullscreenEnabled) {
+      const carouselImages = document.querySelectorAll(
+        "#treeCarousel .carousel-item img"
+      );
+      carouselImages.forEach((image) => {
+        image.style.cursor = "zoom-in";
+        image.addEventListener("click", function () {
+          if (!document.fullscreenElement) {
+            if (image.requestFullscreen) {
+              image.requestFullscreen();
+            } else if (image.webkitRequestFullscreen) {
+              image.webkitRequestFullscreen();
+            } else if (image.webkitEnterFullscreen) {
+              image.webkitEnterFullscreen();
+            }
+            image.style.cursor = "zoom-out";
+          } else {
+            document.exitFullscreen();
+            image.style.cursor = "zoom-in";
+          }
+        });
+      });
+    }
+    const carousel = new bootstrap.Carousel("#treeCarousel");
+  }
+}
+
 function showTreeInfo(feature) {
   if (feature) {
-    let html = "";
-    const name = feature.get("Tree Name");
-    html += `<p class="treeName"><strong>${name}</strong></p>`;
-    const description = feature.get("Description");
-    if (description) {
-      html += `<p>${description}</p>`;
-    }
-
-    displayFields.forEach(function (field) {
-      const fieldValue = feature.get(field);
-      if (fieldValue) {
-        if (field.slice(-3) === "(m)") {
-          // convert meters to feet
-          const measureFeet = (fieldValue * 3.28084).toFixed(2);
-          html += `<p><strong>${field.slice(
-            0,
-            -4
-          )}:</strong> ${fieldValue.toFixed(2)}m (${measureFeet} ft)</p>`;
-        } else {
-          html += `<p><strong>${field}:</strong> ${fieldValue}</p>`;
-        }
-      }
-    });
-
-    // add species info
-    const treeGenus = feature.get("Genus species Text");
-    if (treeGenus) {
-      html += `<p><strong>Species:</strong> ${treeGenus}</p>`;
-
-      const speciesDescription = feature.get("Species Description");
-      if (speciesDescription) {
-        html += `<p>${speciesDescription}</p>`;
-      }
-    }
-
-    // Update Info Panel with Tree Information
     const infoPanel = document.getElementById("infoPanel-content");
     infoPanel.style.padding = "20px";
-    infoPanel.innerHTML = html;
-
-    // Add Google Maps button to bottom of Tree Info
-    const googleMapsButton = document.createElement("button");
-    googleMapsButton.style.border = "none";
-    googleMapsButton.style.background = "none";
-    googleMapsButton.title = "Open in Google Maps";
-    const googleMapsIcon =
-      '<img id="googleMapsIcon" src="img/google-maps-old.svg" style="width: 48px; height: 48px">';
-    googleMapsButton.innerHTML = googleMapsIcon;
-    googleMapsButton.addEventListener("click", function () {
-      const latitude = feature.get("Tree Latitude");
-      const longitude = feature.get("Tree Longitude");
-      let url =
-        "https://www.google.com/maps/search/?api=1&query=" +
-        latitude +
-        "%2C" +
-        longitude;
-      window.open(url);
-    });
-
-    infoPanel.appendChild(googleMapsButton);
-
-    //set up image carousel
-
-    // reset carousel
-    resetCarousel();
-
-    const photos = feature.get("Photo");
-    if (photos) {
-      const carouselIndicators = document.querySelector(".carousel-indicators");
-      const carouselInner = document.querySelector(".carousel-inner");
-
-      photos.forEach((image, index) => {
-        // create carousel indicator
-        const indicator = document.createElement("button");
-        indicator.setAttribute("data-bs-target", "#treeCarousel");
-        indicator.setAttribute("data-bs-slide-to", index);
-        indicator.setAttribute("aria-label", "Slide " + (index + 1));
-
-        // create carousel item
-        const item = document.createElement("div");
-        item.classList.add("carousel-item");
-
-        // create image element
-        const img = document.createElement("img");
-        img.classList.add("d-block", "w-100");
-        img.src = image.url;
-
-        if (index === 0) {
-          indicator.classList.add("active");
-          item.classList.add("active");
-        }
-
-        // add image to item and item to inner carousel
-        carouselIndicators.appendChild(indicator);
-        item.appendChild(img);
-        carouselInner.appendChild(item);
-      });
-
-      // show carousel controls if there are multiple images
-      toggleCarouselControls(photos.length > 1);
-
-      // Click to Fullscreen images
-      if (document.fullscreenEnabled) {
-        const carouselImages = document.querySelectorAll(
-          "#treeCarousel .carousel-item img"
-        );
-        carouselImages.forEach((image) => {
-          image.style.cursor = "zoom-in";
-          image.addEventListener("click", function () {
-            if (!document.fullscreenElement) {
-              if (image.requestFullscreen) {
-                image.requestFullscreen();
-              } else if (image.webkitRequestFullscreen) {
-                image.webkitRequestFullscreen();
-              } else if (image.webkitEnterFullscreen) {
-                image.webkitEnterFullscreen();
-              }
-              image.style.cursor = "zoom-out";
-            } else {
-              document.exitFullscreen();
-              image.style.cursor = "zoom-in";
-            }
-          });
-        });
-      }
-      const carousel = new bootstrap.Carousel("#treeCarousel");
-    }
+    infoPanel.innerHTML = createTreeInfoHTML(feature);
+    infoPanel.appendChild(createGoogleMapsButton(feature));
+    setupImageCarousel(feature);
   }
 }
 
