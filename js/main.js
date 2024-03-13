@@ -28,6 +28,7 @@ const queryFields = [
   "Circumference (m)",
   "Canopy Spread (m)",
   "DBH (m)",
+  "Species Score",
 ];
 
 // fields to show on the info panel when selecting a tree
