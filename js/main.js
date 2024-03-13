@@ -340,8 +340,8 @@ function showTreeInfo(feature) {
       '<img id="googleMapsIcon" src="img/google-maps-old.svg" style="width: 48px; height: 48px">';
     googleMapsButton.innerHTML = googleMapsIcon;
     googleMapsButton.addEventListener("click", function () {
-      const latitude = feature.get("Latitude");
-      const longitude = feature.get("Longitude");
+      const latitude = feature.get("Tree Latitude");
+      const longitude = feature.get("Tree Longitude");
       let url =
         "https://www.google.com/maps/search/?api=1&query=" +
         latitude +
