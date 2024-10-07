@@ -42,7 +42,7 @@ async function fetchTreeRecords() {
     "Map Icon",
     "Tree Name",
     "Description",
-    "Genus species Text",
+ //   "Genus species Text",
     "Species Description",
     "Tree Latitude",
     "Tree Longitude",
@@ -51,9 +51,9 @@ async function fetchTreeRecords() {
     "Age",
     "Condition",
     "Height (m)",
-    "Circumference (m)",
+//    "Circumference (m)",
     "Canopy Spread (m)",
-    "DBH (m)",
+//    "DBH (m)",
     "Species Score",
   ];
 
