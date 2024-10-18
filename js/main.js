@@ -42,7 +42,7 @@ async function fetchTreeRecords() {
     "Map Icon",
     "Tree Name",
     "Description",
- //   "Genus species Text",
+    "Genus species (text)",
     "Species Description",
     "Tree Latitude",
     "Tree Longitude",
@@ -51,9 +51,9 @@ async function fetchTreeRecords() {
     "Age",
     "Condition",
     "Height (m)",
-//    "Circumference (m)",
+    "Tree Cir (m)",
     "Canopy Spread (m)",
-//    "DBH (m)",
+    "Tree DBH (m)",
     "Species Score",
   ];
 
@@ -339,9 +339,9 @@ function createTreeInfoHTML(feature) {
     "Age",
     "Condition",
     "Height (m)",
-    "Circumference (m)",
+    "Tree Cir (m)",
     "Canopy Spread (m)",
-    "DBH (m)",
+    "Tree DBH (m)",
   ];
 
   displayFields.forEach(function (field) {
@@ -352,7 +352,7 @@ function createTreeInfoHTML(feature) {
     }
   });
 
-  const treeGenus = feature.get("Genus species Text");
+  const treeGenus = feature.get("Genus species (text)");
   if (treeGenus) {
     html.push(createHTMLParagraph("Species", treeGenus));
 
